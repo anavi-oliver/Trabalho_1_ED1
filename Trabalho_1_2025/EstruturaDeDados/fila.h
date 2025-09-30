@@ -22,7 +22,6 @@
  Queue: definição do tipo vazio para fila.
  Item: dado genérico armazenado na fila.
 */
-
 typedef void *Queue;     
 typedef void *Item;      
 
