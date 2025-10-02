@@ -16,7 +16,7 @@
 
 typedef void *Circulo;   // Ponteiro genérico para o círculo
 
-/* ======================= FUNÇÕES DE CRIAÇÃO E DESTRUIÇÃO ======================= */
+/*                                FUNÇÕES DE CRIAÇÃO E DESTRUIÇÃO                                */
 
 /*
 Esta função é responsável por criar e inicializar um novo círculo na memória.
@@ -57,7 +57,7 @@ Circulo criarCirculo(int i, double x, double y, double r, char *corb, char *corp
 void destroiCirculo(Circulo c);
 
 
-/* ======================= MÉTODOS GET (CONSULTA) ======================= */
+/*                                 MÉTODOS GET (CONSULTA)                                */
 /*
 *   funções de CONSULTA que permitem ACESSAR (ler) o valor de um campo
 *   específico da estrutura sem modificá-lo.
@@ -120,7 +120,7 @@ operações em lote ou classificação de elementos.
 int getNCirculo(Circulo c);
 
 
-/* ======================= MÉTODOS SET (MODIFICAÇÃO) ======================= */
+/*                                 MÉTODOS SET (MODIFICAÇÃO)                                */
 /*
 * São funções de MODIFICAÇÃO que permitem ALTERAR (escrever) o valor de um
 * campo específico da estrutura.
@@ -183,7 +183,7 @@ em lote de elementos relacionados.
 */
 void setNCirculo(Circulo c, int n);
 
-/* ======================= FUNÇÕES GEOMÉTRICAS ======================= */
+/*                                  FUNÇÕES GEOMÉTRICAS                                  */
 
 /*
  Calcula a área do círculo.

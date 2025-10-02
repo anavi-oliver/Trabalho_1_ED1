@@ -4,6 +4,8 @@
 #include <string.h>
 #include <math.h>
 
+#define PI 3.14159265358979323846
+
 // estrutura interna do círculo
 typedef struct circulo {
     int id;           // identificador único
@@ -17,7 +19,8 @@ typedef struct circulo {
     int n;            // identificador de seleção
 } circuloC;
 
-/* ======================= FUNÇÕES DE CRIAÇÃO E DESTRUIÇÃO ======================= */
+
+/*         FUNÇÕES DE CRIAÇÃO E DESTRUIÇÃO  */
 
 Circulo criarCirculo(int i, double x, double y, double r, char *corb, char *corp, bool disp, int n) {
     if (r <= 0) {
@@ -36,7 +39,6 @@ Circulo criarCirculo(int i, double x, double y, double r, char *corb, char *corp
     c->y = y;
     c->r = r;
     
-    // aloca e copia a cor da borda
     c->corb = (char*) malloc((strlen(corb) + 1) * sizeof(char));
     if (c->corb == NULL) {
         free(c);
@@ -45,7 +47,6 @@ Circulo criarCirculo(int i, double x, double y, double r, char *corb, char *corp
     }
     strcpy(c->corb, corb);
     
-    // aloca e copia a cor de preenchimento
     c->corp = (char*) malloc((strlen(corp) + 1) * sizeof(char));
     if (c->corp == NULL) {
         free(c->corb);
@@ -55,7 +56,7 @@ Circulo criarCirculo(int i, double x, double y, double r, char *corb, char *corp
     }
     strcpy(c->corp, corp);
     
-    c->sw = 1.0;      // valor padrão para stroke-width
+    c->sw = 1.0;      
     c->disp = disp;
     c->n = n;
     
@@ -72,7 +73,7 @@ void destroiCirculo(Circulo c) {
     free(circ);
 }
 
-/* ======================= MÉTODOS GET (CONSULTA) ======================= */
+/*           MÉTODOS GET (CONSULTA)  */
 
 double getXCirculo(Circulo c) {
     circuloC *circ = (circuloC*) c;
@@ -114,7 +115,7 @@ int getNCirculo(Circulo c) {
     return circ->n;
 }
 
-/* ======================= MÉTODOS SET (MODIFICAÇÃO) ======================= */
+/*               MÉTODOS SET (MODIFICAÇÃO)  */
 
 void setXCirculo(Circulo c, double x) {
     circuloC *circ = (circuloC*) c;
@@ -176,16 +177,16 @@ void setNCirculo(Circulo c, int n) {
     circ->n = n;
 }
 
-/* ======================= FUNÇÕES GEOMÉTRICAS ======================= */
+/*               FUNÇÕES GEOMÉTRICAS */
 
 double calculaAreaCirculo(Circulo c) {
     circuloC *circ = (circuloC*) c;
-    return M_PI * circ->r * circ->r;
+    return PI * circ->r * circ->r;
 }
 
 double calculaPerimetroCirculo(Circulo c) {
     circuloC *circ = (circuloC*) c;
-    return 2 * M_PI * circ->r;
+    return 2 * PI * circ->r;
 }
 
 bool pontoNoCirculo(Circulo c, double px, double py) {

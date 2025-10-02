@@ -16,7 +16,7 @@
 
 typedef void *Retangulo;   // Ponteiro genérico para o retângulo
 
-/* ======================= FUNÇÕES DE CRIAÇÃO E DESTRUIÇÃO ======================= */
+/*                   FUNÇÕES DE CRIAÇÃO E DESTRUIÇÃO  */
 /*
 Esta função é responsável por criar e inicializar um novo retângulo na memória.
 
@@ -57,7 +57,7 @@ Retangulo criarRetangulo(int i, double x, double y, double w, double h, char *co
 void destroiRetangulo(Retangulo r);
 
 
-/* ======================= MÉTODOS GET (CONSULTA) ======================= */
+/*                     MÉTODOS GET (CONSULTA)  */
 /*
 *   funções de CONSULTA que permitem ACESSAR (ler) o valor de um campo
 *   específico da estrutura sem modificá-lo.
@@ -128,7 +128,7 @@ operações em lote ou classificação de elementos.
 int getNRetangulo(Retangulo r);
 
 
-/* ======================= MÉTODOS SET (MODIFICAÇÃO) ======================= */
+/*                       MÉTODOS SET (MODIFICAÇÃO)  */
 /*
 * São funções de MODIFICAÇÃO que permitem ALTERAR (escrever) o valor de um
 * campo específico da estrutura.
@@ -201,7 +201,7 @@ em lote de elementos relacionados.
 */
 void setNRetangulo(Retangulo r, int n);
 
-/* ======================= FUNÇÕES GEOMÉTRICAS ======================= */
+/*                         FUNÇÕES GEOMÉTRICAS  */
 //r: ponteiro opaco para o retângulo a ser consultado, que precisa ser válido e nao NULL
 
 // Retorna a área (largura * altura).

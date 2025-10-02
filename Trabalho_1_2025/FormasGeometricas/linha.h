@@ -16,7 +16,7 @@
 
 typedef void *Linha;   // Ponteiro genérico para a linha
 
-/* ======================= FUNÇÕES DE CRIAÇÃO E DESTRUIÇÃO ======================= */
+/*              FUNÇÕES DE CRIAÇÃO E DESTRUIÇÃO */
 
 /*
 Esta função é responsável por criar e inicializar uma nova linha na memória.
@@ -55,7 +55,7 @@ Linha criarLinha(int i, double x1, double y1, double x2, double y2, char *cor, b
 void destroiLinha(Linha l);
 
 
-/* ======================= MÉTODOS GET (CONSULTA) ======================= */
+/*              MÉTODOS GET (CONSULTA) */
 /*
 *   funções de CONSULTA que permitem ACESSAR (ler) o valor de um campo
 *   específico da estrutura sem modificá-lo.
@@ -121,7 +121,7 @@ operações em lote ou classificação de elementos.
 int getNLinha(Linha l);
 
 
-/* ======================= MÉTODOS SET (MODIFICAÇÃO) ======================= */
+/*               MÉTODOS SET (MODIFICAÇÃO)  */
 /*
 * São funções de MODIFICAÇÃO que permitem ALTERAR (escrever) o valor de um
 * campo específico da estrutura.
@@ -188,7 +188,7 @@ em lote de elementos relacionados.
 */
 void setNLinha(Linha l, int n);
 
-/* ======================= FUNÇÕES GEOMÉTRICAS ======================= */
+/*               FUNÇÕES GEOMÉTRICAS */
 
 /*
  Calcula a área da linha.
