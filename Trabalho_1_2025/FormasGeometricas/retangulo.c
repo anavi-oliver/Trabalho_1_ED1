@@ -198,7 +198,6 @@ void setNRetangulo(Retangulo r, int n) {
     ret->n = n;
 }
 
-
 //gemometria
 double calculaAreaRetangulo(Retangulo r) {
     retanguloR *ret = (retanguloR*) r;
