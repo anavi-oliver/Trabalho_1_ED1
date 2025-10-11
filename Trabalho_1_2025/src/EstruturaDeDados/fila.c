@@ -10,9 +10,9 @@ typedef struct aux {
 
 // estrutura da fila
 typedef struct queue {
-    AUX *first;  
-    AUX *last;   
-    int size;    
+    AUX *first;
+    AUX *last;
+    int size;
 } filaC;
 
 // cria uma fila vazia
@@ -53,7 +53,7 @@ void enfileira(Queue q, Item i) {
 Item desenfileira(Queue q) {
     filaC *f = (filaC*) q;
     if (f->size == 0) {
-        return NULL; 
+        return NULL;
     }
     AUX *temp = f->first;
     Item info = temp->item;
@@ -67,7 +67,7 @@ Item desenfileira(Queue q) {
 }
 
 // retorna o primeiro elemento sem remover
-Item inicioFila(Queue q) {
+Item inicioFila(const Queue q) {
     filaC *f = (filaC*) q;
     if (f->first == NULL) {
         return NULL;
@@ -76,7 +76,7 @@ Item inicioFila(Queue q) {
 }
 
 // retorna o último elemento sem remover
-Item fimFila(Queue q) {
+Item fimFila(const Queue q) {
     filaC *f = (filaC*) q;
     if (f->last == NULL) {
         return NULL;
@@ -85,13 +85,26 @@ Item fimFila(Queue q) {
 }
 
 // verifica se a fila está vazia
-bool estaVaziaFila(Queue q) {
+bool estaVaziaFila(const Queue q) {
     filaC *f = (filaC*) q;
     return (f->size == 0);
 }
 
+// NOVA FUNÇÃO ADICIONADA
+// retorna o número de elementos na fila
+int getTamanhoFila(const Queue q) {
+    filaC *f = (filaC*) q;
+    if (f == NULL) {
+        return 0;
+    }
+    return f->size;
+}
+
 // libera toda a fila
 void destroiFila(Queue q) {
+    if (q == NULL) {
+        return;
+    }
     filaC *f = (filaC*) q;
     AUX *atual = f->first;
     while (atual != NULL) {
