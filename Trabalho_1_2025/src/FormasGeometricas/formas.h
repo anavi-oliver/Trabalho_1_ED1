@@ -2,208 +2,166 @@
 #define FORMAS_H
 
 #include <stdio.h>
-#include <math.h> 
-#include "circulo.h"
+#include <stdbool.h> 
 #include "linha.h"
 #include "retangulo.h"
 #include "texto.h"
 
-
-/*_______________________ TIPO ABSTRATO DE DADOS: FORMAS GEOMÉTRICAS GENÉRICAS _______________________*/
+/*_______________________ TIPO ABSTRATO DE DADOS: FORMAS GEOMÉTRICAS _______________________*/
 /*
-*        Este módulo define a interface para manipulação de formas geométricas
-*        de maneira genérica e unificada. Ele atua como uma camada de abstração
-*        sobre os TADs específicos (Círculo, Linha, Retângulo, Texto).
-*                
-*        A estrutura principal (FORMAGERAL) encapsula uma forma geométrica genérica, 
-*        representada por um ponteiro opaco que pode referenciar qualquer tipo de forma.
+* Este módulo define uma interface genérica para manipular diferentes
+* tipos de objetos geométricos (círculos, retângulos, etc.) de forma
+* uniforme. A 'Forma' genérica funciona como um container que armazena
+* atributos comuns a todas as formas e aponta para os dados específicos.
+*
+* - A definição completa da struct está encapsulada no arquivo .c
 */
 
-// Tipos genéricos opacos
-typedef void * FORMAGERAL;  // Forma encapsulada
-typedef void * FORMA;       // Forma específica
-typedef void * Fila;        // Estrutura de fila
-typedef void * Pilha;       // Estrutura de pilha
-typedef void * LANC;        // Lançador
+typedef enum {
+    TIPO_CIRCULO,
+    TIPO_RETANGULO,
+    TIPO_LINHA,
+    TIPO_TEXTO
+} TipoForma;
+
+// Este ponteiro apontará para uma struct que contém o ID, o Tipo e os dados específicos (void*).
+typedef struct Forma_t *Forma;
 
 
-/*________________________________ FUNÇÕES BÁSICAS ________________________________*/
+/*________________________________ FUNÇÕES DE CRIAÇÃO E DESTRUIÇÃO ________________________________*/
 /*
-Cria e configura uma estrutura de forma genérica que encapsula uma forma
-geométrica específica junto com informações sobre seu tipo.
+Cria e encapsula uma forma geométrica. A camada genérica armazena o ID e o tipo,
+e aponta para a forma específica que contém os demais dados.
 
-*        f: ponteiro para a forma geométrica específica já criada 
-*           (pode ser Círculo, Retângulo, Linha ou Texto)
-*        tipo: identificador numérico do tipo da forma:
-*              1 = Círculo
-*              2 = Retângulo
-*              3 = Linha
-*              4 = Texto
+* id: Identificador numérico único para esta forma.
+* tipo: O tipo da forma (ex: TIPO_CIRCULO, TIPO_RETANGULO).
+* dados_especificos: Ponteiro para a forma específica já alocada (ex: um Circulo, um Texto).
 *
-*        Pré-condição: f deve ser um ponteiro válido para uma forma já criada,
-*                      tipo deve estar entre 1 e 4
-*        Pós-condição: retorna um ponteiro opaco para a estrutura FORMAGERAL
-*                      que encapsula a forma e seu tipo, ou NULL em caso de falha
+* Pré-condição: 'dados_especificos' deve ser um ponteiro válido para uma forma criada.
+* Pós-condição: Retorna um ponteiro para a estrutura Forma que encapsula os dados.
 */
-FORMAGERAL setforma(FORMA f, int tipo);
+Forma criaForma(int id, TipoForma tipo, void *dados_especificos);
 
 /*
-Obtém o identificador numérico do tipo da forma geométrica encapsulada (através
-de estruturas condicionais switch/case).
+Libera a memória alocada para a forma genérica e também para a forma
+específica contida nela.
 
-*        f: ponteiro opaco para a forma geométrica genérica
+* f: A forma a ser destruída.
 *
-*        Pré-condição: f deve ser um ponteiro válido para FORMAGERAL
-*        Pós-condição: retorna o tipo da forma (1-4) conforme definido:
-*                      1 = Círculo, 2 = Retângulo, 3 = Linha, 4 = Texto
+* Pré-condição: 'f' deve ser um ponteiro válido.
+* Pós-condição: A memória de 'f' e de seus dados internos é liberada.
 */
-int gettipoforma(FORMA f);
+void destroiForma(Forma f);
+
+
+/*________________________________ FUNÇÕES DE CONSULTA (GETTERS) ________________________________*/
+/*
+Obtém o identificador único (ID) da forma.
+
+* f: Ponteiro para a forma.
+*
+* Pré-condição: 'f' deve ser um ponteiro válido.
+* Pós-condição: Retorna o valor do ID.
+*/
+int getFormaId(const Forma f);
 
 /*
-Obtém a forma geométrica específica encapsulada que está no topo de uma
-estrutura de dados tipo fila. Esta função é utilizada para acessar o
-conteúdo de coleções sem remover o elemento, permitindo inspeção da
-forma no topo da pilha (seguindo o princípio FIFO- First-In, First-Out).
+Obtém o tipo da forma (enum).
 
+* f: Ponteiro para a forma.
 *
-*        f: ponteiro opaco para a estrutura de fila contendo formas
-*
-*        Pré-condição: f deve ser um ponteiro válido para uma Fila não vazia
-*        Pós-condição: retorna ponteiro opaco para a FORMAGERAL no topo da fila,
-*                      sem removê-la da estrutura
+* Pré-condição: 'f' deve ser um ponteiro válido.
+* Pós-condição: Retorna o enum correspondente ao tipo da forma.
 */
-FORMAGERAL gettipofila(Fila f);
+TipoForma getFormaTipo(const Forma f);
 
 /*
-Obtém a forma geométrica específica encapsulada que está no topo de uma
-estrutura de dados tipo pilha. Esta função é utilizada para acessar o
-conteúdo de coleções sem remover o elemento, permitindo inspeção da
-forma no topo da pilha (seguindo o princípio LIFO - Last In, First Out).
+Obtém a coordenada X da âncora da forma.
 
-*        p: ponteiro opaco para a estrutura de pilha contendo formas
+* f: Ponteiro para a forma.
 *
-*        Pré-condição: p deve ser um ponteiro válido para uma Pilha não vazia
-*        Pós-condição: retorna ponteiro opaco para a FORMAGERAL no topo da pilha,
-*                      sem removê-la da estrutura
+* Pré-condição: 'f' deve ser um ponteiro válido.
+* Pós-condição: Retorna a coordenada X como double.
 */
-FORMAGERAL gettipopilha(Pilha p);
+double getFormaX(const Forma f);
 
 /*
-Obtém o identificador único (ID) da forma geométrica, utilizado
-para distinguir formas individuais em coleções, permitindo operações de
-busca, comparação e referência específica.
+Obtém a coordenada Y da âncora da forma.
 
-*        f: ponteiro opaco para a forma geométrica
+* f: Ponteiro para a forma.
 *
-*        Pré-condição: f deve ser um ponteiro válido para FORMA
-*        Pós-condição: retorna ponteiro opaco para o ID da forma
+* Pré-condição: 'f' deve ser um ponteiro válido.
+* Pós-condição: Retorna a coordenada Y como double.
 */
-FORMAGERAL getID(FORMA f);
+double getFormaY(const Forma f);
 
 /*
-Compara os identificadores únicos de duas formas geométricas do mesmo tipo.
+Obtém a cor da borda da forma.
+
+* f: Ponteiro para a forma.
 *
-*        f1: ponteiro opaco para a primeira forma a ser comparada
-*        f2: ponteiro opaco para a segunda forma a ser comparada
-*
-*        Pré-condição: f1 e f2 devem ser ponteiros válidos para FORMAGERAL
-*                      do mesmo tipo geométrico
-*        Pós-condição: retorna valor inteiro indicando a relação entre os IDs:
-*                      < 0 se ID(f1) < ID(f2)
-*                      = 0 se ID(f1) == ID(f2)
-*                      > 0 se ID(f1) > ID(f2)
+* Pré-condição: 'f' deve ser um ponteiro válido.
+* Pós-condição: Retorna um ponteiro para a string da cor de borda.
 */
-int comparaIDformas(FORMAGERAL f1, FORMAGERAL f2);
-
-
-/*________________________________ FUNÇÕES GEOMÉTRICAS ________________________________*/
-/*
-Obtém a coordenada X da âncora (o centro para círculos ou outro ponto característico
-para retângulos, linhas, etc.) da forma geométrica.
-
-*        f: ponteiro opaco para a forma geométrica
-*
-*        Pré-condição: f deve ser um ponteiro válido para FORMAGERAL
-*        Pós-condição: retorna a coordenada X como número de ponto flutuante
-*/
-float getX(FORMAGERAL f);
+char *getFormaCorBorda(const Forma f);
 
 /*
-Obtém a coordenada Y da âncora ou centro da forma geométrica. Complementa
-a função getX para localizar completamente a posição da forma no plano
-cartesiano.
+Obtém a cor de preenchimento da forma.
 
-*        f: ponteiro opaco para a forma geométrica
+* f: Ponteiro para a forma.
 *
-*        Pré-condição: f deve ser um ponteiro válido para FORMAGERAL
-*        Pós-condição: retorna a coordenada Y como número de ponto flutuante
+* Pré-condição: 'f' deve ser um ponteiro válido.
+* Pós-condição: Retorna um ponteiro para a string da cor de preenchimento.
 */
-float getY(FORMAGERAL f);
+char *getFormaCorPreenchimento(const Forma f);
+
+
+/*________________________________ FUNÇÕES DE MODIFICAÇÃO (SETTERS) ________________________________*/
+/*
+Define a posição (coordenadas X e Y) da forma.
+
+* f: Ponteiro para a forma a ser modificada.
+* x: Nova coordenada X.
+* y: Nova coordenada Y.
+*
+* Pré-condição: 'f' deve ser um ponteiro válido.
+* Pós-condição: A posição da forma é atualizada.
+*/
+void setFormaPosicao(Forma f, double x, double y);
 
 /*
-Calcula e retorna a área ocupada pela forma geométrica de maneira genérica.
-Esta função implementa polimorfismo, calculando a área apropriada baseada
-no tipo específico da forma (área do círculo, retângulo, etc.). Para formas
-sem área definida (como linhas), pode retornar 0 ou valor especial.
+Define a cor de borda da forma.
 
-*        f: ponteiro opaco para a forma geométrica
+* f: Ponteiro para a forma a ser modificada.
+* corBorda: Nova cor de borda.
 *
-*        Pré-condição: f deve ser um ponteiro válido para FORMAGERAL
-*        Pós-condição: retorna a área calculada como número de ponto flutuante,
-*                      em unidades quadradas do sistema de coordenadas utilizado
+* Pré-condição: 'f' deve ser um ponteiro válido.
+* Pós-condição: A cor de borda da forma é atualizada.
 */
-float getArea(FORMAGERAL f);
-
-
-/*________________________________ FUNÇÕES DE ESTADO ________________________________*/
+void setFormaCorBorda(Forma f, const char *corBorda);
 
 /*
-Imprime as informações detalhadas da forma em um arquivo de saída de texto (TXT).
-Esta função gera relatórios textuais contendo dados da forma como ID,
-coordenadas, dimensões, cores e outras propriedades relevantes.
+Define a cor de preenchimento da forma.
 
-*        f: ponteiro opaco para a forma geométrica a ser impressa
-*        c: ponteiro opaco para contexto contendo o arquivo de saída
-*           e possíveis configurações de formatação
+* f: Ponteiro para a forma a ser modificada.
+* corPreenchimento: Nova cor de preenchimento.
 *
-*        Pré-condição: f deve ser uma FORMAGERAL válida,
-*                      c deve conter um FILE* válido e aberto para escrita
-*        Pós-condição: retorna a forma após impressão,
-*                      dados da forma são escritos no arquivo especificado
+* Pré-condição: 'f' deve ser um ponteiro válido.
+* Pós-condição: A cor de preenchimento da forma é atualizada.
 */
-FORMAGERAL printLista(FORMAGERAL f, void *c);
+void setFormaCorPreenchimento(Forma f, const char *corPreenchimento);
 
+
+/*________________________________ FUNÇÕES DE RENDERIZAÇÃO ________________________________*/
 /*
-Imprime a representação gráfica da forma em um arquivo SVG (Scalable Vector
-Graphics). Esta função gera o código SVG necessário para visualizar a forma,
-incluindo posicionamento, cores, dimensões e outras propriedades visuais.
+Desenha a representação SVG da forma em um arquivo.
 
-*        x: coordenada X adicional para ajuste de posição (deslocamento)
-*        y: coordenada Y adicional para ajuste de posição (deslocamento)
-*        f: ponteiro opaco para a forma geométrica a ser renderizada
-*        d: fator de escala ou distância para cálculos de visualização
-*        extra: ponteiro opaco para dados extras como FILE* do SVG,
-*               configurações de estilo, ou contexto de renderização
+* f: Ponteiro para a forma a ser desenhada.
+* arquivoSvg: Ponteiro para o arquivo SVG aberto para escrita.
 *
-*        Pré-condição: f deve ser uma FORMAGERAL válida,
-*                      extra deve conter um FILE* válido aberto para escrita SVG
-*        Pós-condição: código SVG da forma é escrito no arquivo,
-*                      a forma é renderizada na posição especificada
+* Pré-condição: 'f' e 'arquivoSvg' devem ser ponteiros válidos.
+* Pós-condição: O código SVG correspondente à forma é escrito no arquivo.
 */
-void printasvg(float x, float y, FORMAGERAL f, float d, void* extra);
-
-/*
-Marca a forma como não viva (destruição lógica). Esta operação não libera
-memória imediatamente, mas sinaliza que a forma deve ser considerada inativa
-ou removida em futuras operações de limpeza, permitindo remoção segura
-durante iterações em coleções.
-
-*        f: ponteiro opaco para a forma geométrica a ser marcada
-*
-*        Pré-condição: f deve ser uma FORMAGERAL válida
-*        Pós-condição: a forma é marcada como "não viva" internamente,
-*                      será ignorada ou removida em operações subsequentes
-*/
-void destruir_form(FORMAGERAL f);
+void desenhaForma(const Forma f, FILE *arquivoSvg);
 
 #endif
