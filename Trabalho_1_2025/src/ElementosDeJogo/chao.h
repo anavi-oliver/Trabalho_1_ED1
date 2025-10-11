@@ -21,7 +21,6 @@
 * - A definição completa da struct está encapsulada no arquivo chao.c.
 */
 
-// Definição do tipo opaco para o TAD Chão, mantendo o encapsulamento.
 typedef struct Chao_t *Chao;
 
 
