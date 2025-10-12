@@ -55,7 +55,7 @@ void adicionaFormaChao(Chao c, Forma f) {
         return;
     }
 
-    // Adicionar uma forma no chão é simplesmente enfileirar na nossa fila interna.
+    //add uma forma no chão é simplesmente enfileirar na nossa fila interna.
     enfileira(c->fila_de_formas, f);
 }
 
@@ -64,7 +64,7 @@ Forma removeFormaChao(Chao c) {
         return NULL;
     }
 
-    // Remover uma forma do chão é simplesmente desenfileirar da nossa fila interna.
+    //remover uma forma do chão é simplesmente desenfileirar da nossa fila interna
     return (Forma) desenfileira(c->fila_de_formas);
 }
 
@@ -73,7 +73,7 @@ Forma removeFormaChao(Chao c) {
 
 bool chaoEstaVazio(const Chao c) {
     if (c == NULL) {
-        return true; // Um chão que não existe pode ser considerado vazio.
+        return true; //um chão que não existe pode ser considerado vazio
     }
     return estaVaziaFila(c->fila_de_formas);
 }
