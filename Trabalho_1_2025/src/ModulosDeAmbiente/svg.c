@@ -11,11 +11,11 @@ FILE* inicializaSvg(char *caminho, double largura, double altura) {
         return NULL;
     }
 
-    // Cabeçalho SVG com viewBox
+    // SVG com viewBox
     fprintf(svg, "<svg width=\"100%%\" height=\"100%%\" viewBox=\"0 0 %.0f %.0f\" xmlns=\"http://www.w3.org/2000/svg\">\n", 
             largura, altura);
     
-    // Fundo cinza claro
+    //fundo = cinza claro
     fprintf(svg, "\t<rect width=\"100%%\" height=\"100%%\" fill=\"#f0f0f0\" />\n");
     
     return svg;

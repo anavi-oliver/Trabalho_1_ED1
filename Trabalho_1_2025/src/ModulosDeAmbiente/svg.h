@@ -48,7 +48,7 @@ de desenho visível.
 FILE* inicializaSvg(char *caminho, double largura, double altura);
 
 /*
-Finaliza e fecha o arquivo SVG corretamente.
+Finaliza e fecha o arquivo SVG.
 
 Esta função escreve a tag de fechamento </svg> e fecha o arquivo,
 garantindo que todo o conteúdo seja salvo corretamente no disco.
