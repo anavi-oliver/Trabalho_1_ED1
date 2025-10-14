@@ -38,7 +38,6 @@ agrupamento ou filtragem de círculos.
 *        corb: string representando a cor da borda/contorno do círculo
 *        corp: string representando a cor de preenchimento interno do círculo
 *        disp: flag booleana indicando se o círculo foi disparado/ativado
-*        n : identificador numérico adicional para seleção ou agrupamento
 *
 *       Pré-condição: o raio r > 0 para formar um círculo válido
 *       Pós-condição: retorna um ponteiro opaco para a estrutura do círculo criadoou NULL em caso de falha na alocação de memória
@@ -66,6 +65,11 @@ void destroiCirculo(Circulo c);
 //c: ponteiro opaco para o círculo a ser consultado, que precisa ser válido e nao NULL
 
 /*
+Retorna o ID/ identificador unico do círculo, sem modificar o círculo.
+*/
+int getIdCirculo(const Circulo c);
+/*
+
 Retorna a coordenada X do centro do círculo, sem modificar o círculo.
 X representa a posição horizontal do centro no sistema
 */
