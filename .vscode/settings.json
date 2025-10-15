@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "stdio.h": "c",
+        "arena.h": "c",
+        "texto.h": "c",
+        "formas.h": "c"
+    }
+}

@@ -3,6 +3,8 @@
 
 #include <stdio.h>
 #include <stdbool.h> 
+
+#include "circulo.h"
 #include "linha.h"
 #include "retangulo.h"
 #include "texto.h"
