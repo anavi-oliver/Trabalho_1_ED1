@@ -41,7 +41,7 @@ src/ElementosDeJogo/arena.o: src/ElementosDeJogo/arena.c src/ElementosDeJogo/are
 src/ElementosDeJogo/carregador.o: src/ElementosDeJogo/carregador.c src/ElementosDeJogo/carregador.h src/ElementosDeJogo/chao.h src/EstruturaDeDados/fila.h src/FormasGeometricas/formas.h src/FormasGeometricas/circulo.h src/FormasGeometricas/linha.h src/FormasGeometricas/retangulo.h src/FormasGeometricas/texto.h
 src/ElementosDeJogo/chao.o: src/ElementosDeJogo/chao.c src/ElementosDeJogo/chao.h src/EstruturaDeDados/fila.h src/FormasGeometricas/formas.h src/FormasGeometricas/circulo.h src/FormasGeometricas/linha.h src/FormasGeometricas/retangulo.h src/FormasGeometricas/texto.h
 src/ElementosDeJogo/disparador.o: src/ElementosDeJogo/disparador.c src/ElementosDeJogo/disparador.h src/ElementosDeJogo/carregador.h src/ElementosDeJogo/chao.h src/EstruturaDeDados/fila.h src/FormasGeometricas/formas.h src/FormasGeometricas/circulo.h src/FormasGeometricas/linha.h src/FormasGeometricas/retangulo.h src/FormasGeometricas/texto.h
-src/ElementosDeJogo/colisao.o: #falta acabar
+src/ElementosDeJogo/colisao.o: src/ElementosDeJogo/colisao.c src/ElementosDeJogo/colisao.h src/FormasGeometricas/formas.h src/FormasGeometricas/circulo.h src/FormasGeometricas/linha.h src/FormasGeometricas/retangulo.h src/FormasGeometricas/texto.h
 
 #estrutura de dados
 src/EstruturaDeDados/fila.o: src/EstruturaDeDados/fila.c src/EstruturaDeDados/fila.h 
