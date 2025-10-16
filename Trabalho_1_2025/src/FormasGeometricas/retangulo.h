@@ -233,4 +233,21 @@ Retorna true se houver interseção.
 */
 bool retangulosIntersectam(Retangulo r1, Retangulo r2);
 
+
+//                            RENDERIZAÇÃO                               //
+
+/*
+Imprime a representação SVG do retangulo em um arquivo. Esta função gera
+o código SVG necessário para visualizar o texto na posição especificada,
+com as cores, âncora e estilo tipográfico definidos. A âncora é convertida
+automaticamente para o formato SVG ('i'→"start", 'm'→"middle", 'f'→"end").
+
+*        r: ponteiro opaco para o retangulo a ser renderizado
+*        arquivo: ponteiro para FILE aberto para escrita em modo SVG
+*
+*        Pré-condição: r deve ser um ponteiro válido para Retangulo,
+*                      arquivo deve ser um FILE* válido aberto para escrita
+*/
+void imprimeRetanguloSVG(Retangulo r, FILE *arquivo);
+
 #endif

@@ -24,7 +24,7 @@ Retangulo criarRetangulo(int i, double x, double y, double w, double h, char *co
         return NULL;
     }
 //alocar
-    retanguloR *r= (Retangulo*) malloc (sizeof(Retangulo));
+    retanguloR *r= (retanguloR*) malloc (sizeof(retanguloR));
     if(r==NULL){
         printf("\n Erro na alocacao de memoria!!\n");
         exit(1);
@@ -228,4 +228,23 @@ bool retangulosIntersectam(Retangulo r1, Retangulo r2) {
     }
     
     return true; // há interseção
+}
+
+//renderizacao
+
+void imprimeRetanguloSVG(Retangulo r, FILE *arquivo) {
+    if (r == NULL || arquivo == NULL) {
+        return;
+    }
+
+    retanguloR *ret = (retanguloR*) r;
+
+    fprintf(arquivo, "\t<rect x=\"%.2f\" y=\"%.2f\" width=\"%.2f\" height=\"%.2f\" fill=\"%s\" stroke=\"%s\" stroke-width=\"%.2f\" />\n",
+            ret->x,
+            ret->y,
+            ret->w,
+            ret->h,
+            ret->corp,  
+            ret->corb,  
+            ret->sw);
 }

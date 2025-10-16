@@ -231,4 +231,22 @@ bool pontoNoCirculo(Circulo c, double px, double py);
 */
 bool circulosIntersectam(Circulo c1, Circulo c2);
 
+
+//                            RENDERIZAÇÃO                               //
+
+/*
+Imprime a representação SVG do circulo em um arquivo. Esta função gera
+o código SVG necessário para visualizar o texto na posição especificada,
+com as cores, âncora e estilo tipográfico definidos. A âncora é convertida
+automaticamente para o formato SVG ('i'→"start", 'm'→"middle", 'f'→"end").
+
+*        c: ponteiro opaco para o circulo a ser renderizado
+*        arquivo: ponteiro para FILE aberto para escrita em modo SVG
+*
+*        Pré-condição: c deve ser um ponteiro válido para Circulo,
+*                      arquivo deve ser um FILE* válido aberto para escrita
+*/
+void imprimeCirculoSVG(Circulo c, FILE *arquivo);
+
+
 #endif

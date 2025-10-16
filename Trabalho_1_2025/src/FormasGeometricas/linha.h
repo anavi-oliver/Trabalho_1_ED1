@@ -210,4 +210,20 @@ double calculaAreaLinha(Linha l);
 */
 double calculaComprimentoLinha(Linha l);
 
+//                            RENDERIZAÇÃO                               //
+
+/*
+Imprime a representação SVG da linha em um arquivo. Esta função gera
+o código SVG necessário para visualizar o texto na posição especificada,
+com as cores, âncora e estilo tipográfico definidos. A âncora é convertida
+automaticamente para o formato SVG ('i'→"start", 'm'→"middle", 'f'→"end").
+
+*        l: ponteiro opaco para a linha a ser renderizada
+*        arquivo: ponteiro para FILE aberto para escrita em modo SVG
+*
+*        Pré-condição: l deve ser um ponteiro válido para Linha,
+*                      arquivo deve ser um FILE* válido aberto para escrita
+*/
+void imprimeLinhaSVG(Linha l, FILE *arquivo);
+
 #endif

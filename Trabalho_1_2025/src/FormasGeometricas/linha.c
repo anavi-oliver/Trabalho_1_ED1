@@ -161,3 +161,22 @@ double calculaComprimentoLinha(Linha l) {
 double calculaAreaLinha(Linha l) {
     return 10 * calculaComprimentoLinha(l);
 }
+
+/*                          RENDERIZACAO                    */
+
+void imprimeLinhaSVG(Linha l, FILE *arquivo) {
+    if (l == NULL || arquivo == NULL) {
+        return;
+    }
+
+    linhaC *linha = (linhaC*) l;
+
+    //imprime a tag <line> no arquivo SVG com os atributos da struct
+    fprintf(arquivo, "\t<line x1=\"%.2f\" y1=\"%.2f\" x2=\"%.2f\" y2=\"%.2f\" stroke=\"%s\" stroke-width=\"%.2f\" />\n",
+            linha->x1,
+            linha->y1,
+            linha->x2,
+            linha->y2,
+            linha->cor,
+            linha->sw);
+}
