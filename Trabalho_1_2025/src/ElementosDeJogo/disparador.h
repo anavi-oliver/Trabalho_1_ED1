@@ -149,4 +149,5 @@ void preparaDisparo(Disparador d, char lado, int n);
  */
 Forma dispara(Disparador d, double dx, double dy);
 
+
 #endif 

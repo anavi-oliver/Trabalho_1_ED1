@@ -164,6 +164,13 @@ char *getFormaCorPreenchimento(const Forma f) {
     return NULL;
 }
 
+void* getFormaAssoc(const Forma f) {
+    if (!f) {
+        return NULL;
+    }
+    
+    return f->dados_especificos;
+}
 
 /*________________________________ FUNÇÕES DE MODIFICAÇÃO (SETTERS) ________________________________*/
 

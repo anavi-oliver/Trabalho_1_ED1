@@ -24,7 +24,7 @@ typedef struct stRepositorio {
     int num_carregadores;
     Disparador disparadores[MAX_OBJETOS];
     int num_disparadores;
-} Repositorio;
+} RepositorioR;
 
 
 /*________________________________ FUNÇÕES AUXILIARES INTERNAS ________________________________*/
@@ -42,7 +42,7 @@ static void imprimeDetalhesForma(Forma f, FILE *arquivo) {
     
     switch (tipo) {
         case TIPO_CIRCULO:
-            fprintf(arquivo, "Círculo, Centro: (%.2f, %.2f), Raio: %.2f, ", x, y, 0.0); // Precisaria de getRaio
+            fprintf(arquivo, "Círculo, Centro: (%.2f, %.2f), Raio: %.2f, ", x, y, getRCirculo(getFormaAssoc(f)));           
             fprintf(arquivo, "Borda: %s, Preench: %s\n", 
                     getFormaCorBorda(f), getFormaCorPreenchimento(f));
             break;
@@ -67,44 +67,47 @@ static void imprimeDetalhesForma(Forma f, FILE *arquivo) {
 }
 
 static Disparador encontraOuCriaDisparador(Repositorio *repo, int id) {
-    for (int i = 0; i < repo->num_disparadores; i++) {
-        if (getDisparadorId(repo->disparadores[i]) == id) {
-            return repo->disparadores[i];
+    RepositorioR *repo_interno = (RepositorioR *)repo;
+for (int i = 0; i < repo_interno->num_disparadores; i++) {
+        if (getDisparadorId(repo_interno->disparadores[i]) == id) {
+            return repo_interno->disparadores[i];
         }
     }
     
-    if (repo->num_disparadores < MAX_OBJETOS) {
+    if (repo_interno->num_disparadores < MAX_OBJETOS) {
         Disparador novo = criaDisparador(id, 0.0, 0.0, NULL, NULL);
-        repo->disparadores[repo->num_disparadores] = novo;
-        repo->num_disparadores++;
+        repo_interno->disparadores[repo_interno->num_disparadores] = novo;
+        repo_interno->num_disparadores++;
         return novo;
     }
     
     return NULL;
 }
+
 
 static Carregador encontraOuCriaCarregador(Repositorio *repo, int id) {
-    for (int i = 0; i < repo->num_carregadores; i++) {
-        if (getCarregadorId(repo->carregadores[i]) == id) {
-            return repo->carregadores[i];
+    RepositorioR *repo_interno = (RepositorioR *)repo;
+
+for (int i = 0; i < repo_interno->num_carregadores; i++) {
+        if (getCarregadorId(repo_interno->carregadores[i]) == id) {
+            return repo_interno->carregadores[i];
         }
     }
     
-    if (repo->num_carregadores < MAX_OBJETOS) {
+    if (repo_interno->num_carregadores < MAX_OBJETOS) {
         Carregador novo = criaCarregador(id);
-        repo->carregadores[repo->num_carregadores] = novo;
-        repo->num_carregadores++;
+        repo_interno->carregadores[repo_interno->num_carregadores] = novo;
+        repo_interno->num_carregadores++;
         return novo;
     }
     
     return NULL;
 }
-
 
 /*________________________________ FUNÇÕES PÚBLICAS ________________________________*/
 
-Repositorio* criaRepositorio() {
-    Repositorio *repo = (Repositorio *)malloc(sizeof(Repositorio));
+Repositorio criaRepositorio() {
+    RepositorioR *repo = (RepositorioR *)malloc(sizeof(RepositorioR));
     if (repo == NULL) {
         printf("Erro ao alocar memoria para o repositorio!\n");
         return NULL;
@@ -113,23 +116,25 @@ Repositorio* criaRepositorio() {
     repo->num_carregadores = 0;
     repo->num_disparadores = 0;
     
-    return repo;
+    return (Repositorio) repo;
 }
 
-void destroiRepositorio(Repositorio* repo) {
-    if (repo == NULL) {
+void destroiRepositorio(Repositorio repo) {
+    RepositorioR * repo_interno = (RepositorioR* )repo;
+    
+    if (repo_interno == NULL) {
         return;
     }
     
-    for (int i = 0; i < repo->num_carregadores; i++) {
-        destroiCarregador(repo->carregadores[i]);
+for (int i = 0; i < repo_interno->num_carregadores; i++) {
+        destroiCarregador(repo_interno->carregadores[i]);
     }
     
-    for (int i = 0; i < repo->num_disparadores; i++) {
-        destroiDisparador(repo->disparadores[i]);
+    for (int i = 0; i < repo_interno->num_disparadores; i++) {
+        destroiDisparador(repo_interno->disparadores[i]);
     }
     
-    free(repo);
+    free(repo_interno);
 }
 
 void processaQry(const char *nome_path_qry, const char *nome_txt, Arena arena, Chao chao, double *pontuacao_total) {
@@ -146,7 +151,7 @@ void processaQry(const char *nome_path_qry, const char *nome_txt, Arena arena, C
         return;
     }
     
-    Repositorio *repo = criaRepositorio();
+    Repositorio repo = criaRepositorio();
     if (repo == NULL) {
         fclose(arquivo_qry);
         fclose(arquivo_txt);

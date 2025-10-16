@@ -113,4 +113,15 @@ int getCarregadorTamanho(const Carregador c);
  */
 bool carregadorEstaVazio(const Carregador c);
 
+/*
+ Insere uma forma diretamente no Carregador (no final da fila).
+ 
+ * c: O Carregador que receberá a forma.
+ * f: A Forma a ser inserida.
+ 
+ * Pré-condição: 'c' e 'f' devem ser válidos.
+ * Pós-condição: A forma é adicionada ao final do Carregador.
+ */
+void insereFormaCarregador(Carregador c, Forma f);
+
 #endif 

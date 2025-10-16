@@ -106,3 +106,10 @@ bool carregadorEstaVazio(const Carregador c) {
     // Delega a verificação para a função da TAD Fila
     return estaVaziaFila(c->filaDeFormas);
 }
+
+void insereFormaCarregador(Carregador c, Forma f) {
+    if (c == NULL || f == NULL) {
+        return;
+    }
+    enfileira(c->filaDeFormas, f);
+}

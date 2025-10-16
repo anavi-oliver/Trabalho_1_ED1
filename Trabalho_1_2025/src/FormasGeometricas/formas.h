@@ -118,6 +118,17 @@ Obtém a cor de preenchimento da forma.
 char *getFormaCorPreenchimento(const Forma f);
 
 
+/*
+Obtém o ponteiro para os dados específicos da forma (o objeto Circulo, Retangulo, etc.).
+
+* f: Ponteiro para a forma.
+*
+* Pré-condição: 'f' deve ser um ponteiro válido.
+* Pós-condição: Retorna o ponteiro void* para os dados específicos.
+*/
+void* getFormaAssoc(const Forma f);
+
+
 /*________________________________ FUNÇÕES DE MODIFICAÇÃO (SETTERS) ________________________________*/
 /*
 Define a posição (coordenadas X e Y) da forma.
