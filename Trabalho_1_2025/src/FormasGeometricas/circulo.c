@@ -213,12 +213,12 @@ void imprimeCirculoSVG(Circulo c, FILE *arquivo) {
     
     circuloC *circ = (circuloC *)c;
     
-    fprintf(arquivo, "  <circle cx=\"%.2f\" cy=\"%.2f\" r=\"%.2f\" ",
-            circ->x, circ->y, circ->r);
-    
-    fprintf(arquivo, "stroke=\"%s\" fill=\"%s\" ",
-            circ->corb, circ->corp);
-    
-    fprintf(arquivo, "stroke-width=\"%.2f\"/>\n",
-            circ->sw);
+fprintf(arquivo, "  <circle cx=\"%.2f\" cy=\"%.2f\" r=\"%.2f\" ",
+        circ->x, circ->y, circ->r);
+
+fprintf(arquivo, "stroke=\"%s\" fill=\"%s\" fill-opacity=\"0.5\" ",
+        circ->corb, circ->corp);
+
+fprintf(arquivo, "stroke-width=\"%.2f\"/>\n",
+        circ->sw);
 }

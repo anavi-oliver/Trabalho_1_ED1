@@ -183,9 +183,9 @@ int main(int argc, char *argv[]) {
     Arena minhaArena = NULL;
     double pontuacaoTotal = 0.0;
 
-    // Dimensões padrão (pode ser ajustado se o .geo definir dimensões, mas aqui usamos fixo)
-    const double LARGURA_ARENA = 500.0;
-    const double ALTURA_ARENA = 500.0;
+    //aumentar view
+    const double LARGURA_ARENA = 600.0;
+    const double ALTURA_ARENA = 600.0;
     
     minhaArena = criaArena(LARGURA_ARENA, ALTURA_ARENA);
     if (minhaArena == NULL) {

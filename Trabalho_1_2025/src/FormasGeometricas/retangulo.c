@@ -238,13 +238,12 @@ void imprimeRetanguloSVG(Retangulo r, FILE *arquivo) {
     }
 
     retanguloR *ret = (retanguloR*) r;
-
-    fprintf(arquivo, "\t<rect x=\"%.2f\" y=\"%.2f\" width=\"%.2f\" height=\"%.2f\" fill=\"%s\" stroke=\"%s\" stroke-width=\"%.2f\" />\n",
-            ret->x,
-            ret->y,
-            ret->w,
-            ret->h,
-            ret->corp,  
-            ret->corb,  
-            ret->sw);
+fprintf(arquivo, "\t<rect x=\"%.2f\" y=\"%.2f\" width=\"%.2f\" height=\"%.2f\" fill=\"%s\" fill-opacity=\"0.5\" stroke=\"%s\" stroke-width=\"%.2f\" />\n",
+        ret->x,
+        ret->y,
+        ret->w,
+        ret->h,
+        ret->corp,  
+        ret->corb,  
+        ret->sw);
 }
