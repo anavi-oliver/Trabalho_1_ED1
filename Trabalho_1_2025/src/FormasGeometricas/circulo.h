@@ -157,10 +157,10 @@ Esta operação permite mudanças dinâmicas na cor da borda,
 possibilitando efeitos visuais como destaque, seleção ou indicação
 de estado.
 */
-void setCorbCirculo(Circulo c, char* corb);
+void setCorbCirculo(Circulo c,const char* corb);
 
 //Define a cor de preenchimento interno, modificando a aparência do interior do círculo.
-void setCorpCirculo(Circulo c, char* corp);
+void setCorpCirculo(Circulo c,const char* corp);
 
 /*
 Define a largura do traço da borda (pré-requisito: sw >= 0).

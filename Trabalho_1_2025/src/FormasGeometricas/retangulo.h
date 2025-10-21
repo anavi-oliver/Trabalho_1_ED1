@@ -171,10 +171,10 @@ Esta operação permite mudanças dinâmicas na cor da borda,
 possibilitando efeitos visuais como destaque, seleção ou indicação
 de estado.
 */
-void setCorbRetangulo(Retangulo r, char* corb);
+void setCorbRetangulo(Retangulo r,const char* corb);
 
 //Define a cor de preenchimento interno, modificando a aparência do interior do retângulo.
-void setCorpRetangulo(Retangulo r, char* corp);
+void setCorpRetangulo(Retangulo r,const char* corp);
 
 /*
 Define a largura do traço da borda (pré-requisito: sw >= 0).

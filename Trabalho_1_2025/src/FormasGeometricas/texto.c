@@ -253,6 +253,8 @@ Estilo getEstiloTexto(const Texto t) {
     return (Estilo)((Texto_t *)t)->e;
 }
 
+//set
+
 void setXTexto(Texto t, double x) {
     if (t == NULL) return;
     ((Texto_t *)t)->x = x;

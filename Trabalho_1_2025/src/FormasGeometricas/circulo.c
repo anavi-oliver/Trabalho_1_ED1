@@ -74,7 +74,13 @@ void destroiCirculo(Circulo c) {
 }
 
 /*           MÉTODOS GET (CONSULTA)  */
-
+int getIdCirculo(const Circulo c) {
+    if (c == NULL) {
+        return -1; // Retorna ID inválido em caso de erro
+    }
+    circuloC *circ = (circuloC*) c;
+    return circ->id;
+}
 double getXCirculo(Circulo c) {
     circuloC *circ = (circuloC*) c;
     return circ->x;
@@ -136,7 +142,7 @@ void setRCirculo(Circulo c, double r) {
     circ->r = r;
 }
 
-void setCorbCirculo(Circulo c, char* corb) {
+void setCorbCirculo(Circulo c,const char* corb) {
     circuloC *circ = (circuloC*) c;
     free(circ->corb);
     circ->corb = (char*) malloc((strlen(corb) + 1) * sizeof(char));
@@ -147,7 +153,7 @@ void setCorbCirculo(Circulo c, char* corb) {
     strcpy(circ->corb, corb);
 }
 
-void setCorpCirculo(Circulo c, char* corp) {
+void setCorpCirculo(Circulo c, const char* corp) {
     circuloC *circ = (circuloC*) c;
     free(circ->corp);
     circ->corp = (char*) malloc((strlen(corp) + 1) * sizeof(char));

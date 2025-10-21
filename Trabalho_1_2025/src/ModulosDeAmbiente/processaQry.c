@@ -138,6 +138,8 @@ for (int i = 0; i < repo_interno->num_carregadores; i++) {
 }
 
 void processaQry(const char *nome_path_qry, const char *nome_txt, Arena arena, Chao chao, double *pontuacao_total) {
+    (void)arena;
+
     FILE *arquivo_qry = fopen(nome_path_qry, "r");
     if (arquivo_qry == NULL) {
         printf("Erro ao abrir o arquivo .qry: %s\n", nome_path_qry);
@@ -212,21 +214,47 @@ void processaQry(const char *nome_path_qry, const char *nome_txt, Arena arena, C
         
         //atch: attach carregadores - atch d cesq cdir
         else if (strcmp(comando, "atch") == 0) {
-            int id_disp, id_esq, id_dir;
-            sscanf(linha_buffer, "atch %d %d %d", &id_disp, &id_esq, &id_dir);
-            
-            Disparador d = encontraOuCriaDisparador(repo, id_disp);
-            Carregador esq = encontraOuCriaCarregador(repo, id_esq);
-            Carregador dir = encontraOuCriaCarregador(repo, id_dir);
-            
-            if (d != NULL && esq != NULL && dir != NULL) {
-                // Reconecta os carregadores ao disparador
-                // (Assumindo que o disparador tem setters ou que será recriado)
-                fprintf(arquivo_txt, "    Disparador %d conectado: carregador %d (esq) e %d (dir)\n", 
-                        id_disp, id_esq, id_dir);
-                instrucoes_realizadas++;
-            }
+    int id_disp, id_esq, id_dir;
+    sscanf(linha_buffer, "atch %d %d %d", &id_disp, &id_esq, &id_dir);
+    
+    // 1. Primeiro, garante que os carregadores existem
+    Carregador esq = encontraOuCriaCarregador(repo, id_esq);
+    Carregador dir = encontraOuCriaCarregador(repo, id_dir);
+    
+    if (esq == NULL || dir == NULL) {
+        fprintf(arquivo_txt, "    ERRO: Carregadores invalidos\n");
+        continue;
+    }
+    
+    // 2. Agora verifica se o disparador já existe
+    RepositorioR *repo_interno = (RepositorioR *)repo;
+    Disparador d = NULL;
+    
+    for (int i = 0; i < repo_interno->num_disparadores; i++) {
+        if (getDisparadorId(repo_interno->disparadores[i]) == id_disp) {
+            d = repo_interno->disparadores[i];
+            break;
         }
+    }
+    
+    // 3. Se não existe, cria AGORA com os carregadores válidos
+    if (d == NULL) {
+        d = criaDisparador(id_disp, 0.0, 0.0, esq, dir);
+        if (d != NULL && repo_interno->num_disparadores < MAX_OBJETOS) {
+            repo_interno->disparadores[repo_interno->num_disparadores] = d;
+            repo_interno->num_disparadores++;
+        }
+    } else {
+        // 4. Se já existe, reconecta (usando a função que você criou)
+        reconectaCarregadores(d, esq, dir);
+    }
+    
+    if (d != NULL) {
+        fprintf(arquivo_txt, "    Disparador %d conectado: carregador %d (esq) e %d (dir)\n", 
+                id_disp, id_esq, id_dir);
+        instrucoes_realizadas++;
+    }
+}
         
         //shft:preparar disparo - shft d [e|d] n
         else if (strcmp(comando, "shft") == 0) {
@@ -276,7 +304,7 @@ void processaQry(const char *nome_path_qry, const char *nome_txt, Arena arena, C
                     fprintf(arquivo_txt, "    Posição final forma: (%.2f, %.2f)\n", x_final, y_final);
                     
                     //adiciona se implementado
-                    // adicionaFormaArena(arena, forma_disparada);
+                    insereFormaArena(arena, forma_disparada);
                     
                     //tratamento das flags v (visual) ou i
                     if (num_params == 4) {
@@ -336,7 +364,7 @@ void processaQry(const char *nome_path_qry, const char *nome_txt, Arena arena, C
                         imprimeDetalhesForma(forma_disparada, arquivo_txt);
                         
                         //adiciona na arena
-                        //adicionaFormaArena(arena, forma_disparada);
+                        insereFormaArena(arena, forma_disparada);
                     }
                     
                     i++;

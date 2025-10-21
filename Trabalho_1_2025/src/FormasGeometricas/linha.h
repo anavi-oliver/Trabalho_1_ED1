@@ -161,7 +161,7 @@ Esta operação permite mudanças dinâmicas na cor da linha,
 possibilitando efeitos visuais como destaque, seleção ou indicação
 de estado.
 */
-void setCorLinha(Linha l, char* cor);
+void setCorLinha(Linha l,const char* cor);
 
 /*
 Define a largura do traço (pré-requisito: sw >= 0).

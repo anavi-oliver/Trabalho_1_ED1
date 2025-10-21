@@ -1,4 +1,4 @@
-
+//linha 187 para o viewbox
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -19,8 +19,7 @@
 //makefile com padrão C99.
 #define PATH_LEN 512
 #define FILE_NAME_LEN 256
-#define MAX_FULL_PATH (PATH_LEN + FILE_NAME_LEN + 2) 
-
+#define MAX_FULL_PATH 1024  // Tamanho fixo 
 
 // ======================= FUNÇÕES AUXILIARES DE CAMINHO =======================
 static void trataPath(char *path, int tamMax, char* arg) {
@@ -184,8 +183,9 @@ int main(int argc, char *argv[]) {
     double pontuacaoTotal = 0.0;
 
     //aumentar view
-    const double LARGURA_ARENA = 600.0;
-    const double ALTURA_ARENA = 600.0;
+    const double LARGURA_ARENA = 600.0; //1555
+    const double ALTURA_ARENA = 600.0; //810
+ 
     
     minhaArena = criaArena(LARGURA_ARENA, ALTURA_ARENA);
     if (minhaArena == NULL) {
@@ -228,53 +228,54 @@ int main(int argc, char *argv[]) {
 
 
     // ======================= 6. PROCESSAMENTO DO ARQUIVO .QRY (SE EXISTIR) =======================
+// ======================= 6. PROCESSAMENTO DO ARQUIVO .QRY (SE EXISTIR) =======================
 
-    if (arqQry != '\0') {
-        char nomeBaseQry[FILE_NAME_LEN];
-        getNomeBase(arqQry, nomeBaseQry, FILE_NAME_LEN);
+if (arqQry[0] != '\0') {
+    // Extrair apenas o nome do arquivo .qry (sem subdiretórios)
+    char *ultimaBarra = strrchr(arqQry, '/');
+    char *nomeArquivoQry = (ultimaBarra != NULL) ? ultimaBarra + 1 : arqQry;
+    
+    char nomeBaseQry[FILE_NAME_LEN];
+    getNomeBase(nomeArquivoQry, nomeBaseQry, FILE_NAME_LEN);
 
-        char *caminhoCompletoQry = montaCaminhoCompleto(dirEntrada, arqQry);
-        
-        // Nomes de saída do QRY: arq-arqcons.svg e arq-arqcons.txt
-        char nomeSaidaBaseQry[MAX_FULL_PATH];
-        sprintf(nomeSaidaBaseQry, "%s-%s", nomeBaseGeo, nomeBaseQry);
-        
-        char nomeTxtQry[MAX_FULL_PATH];
-        sprintf(nomeTxtQry, "%s.txt", nomeSaidaBaseQry);
-        
-        char *caminhoTxtQry = montaCaminhoCompleto(dirSaida, nomeTxtQry);
-        
-        // Chamada principal para processar o QRY
-        processaQry(caminhoCompletoQry, caminhoTxtQry, minhaArena, meuChao, &pontuacaoTotal);
-        
-        printf("Processamento QRY concluido. Pontuacao final: %.2f\n", pontuacaoTotal);
+    char *caminhoCompletoQry = montaCaminhoCompleto(dirEntrada, arqQry);
+    
+    // Nomes de saída do QRY: arq-arqcons.svg e arq-arqcons.txt
+    char nomeSaidaBaseQry[MAX_FULL_PATH];
+    sprintf(nomeSaidaBaseQry, "%s-%s", nomeBaseGeo, nomeBaseQry);
+    
+    char nomeTxtQry[MAX_FULL_PATH];
+    sprintf(nomeTxtQry, "%s.txt", nomeSaidaBaseQry);
+    
+    char *caminhoTxtQry = montaCaminhoCompleto(dirSaida, nomeTxtQry);
+    
+    // Chamada principal para processar o QRY
+    processaQry(caminhoCompletoQry, caminhoTxtQry, minhaArena, meuChao, &pontuacaoTotal);
+    
+    printf("Processamento QRY concluido. Pontuacao final: %.2f\n", pontuacaoTotal);
 
-        // --- Geracao do SVG Final (apos o QRY) ---
-        // Este SVG deve representar o estado final do "banco de dados"
-        char nomeSvgFinal[MAX_FULL_PATH];
-        sprintf(nomeSvgFinal, "%s.svg", nomeSaidaBaseQry);
+    // --- Geração do SVG Final (após o QRY) ---
+    char nomeSvgFinal[MAX_FULL_PATH];
+    sprintf(nomeSvgFinal, "%s.svg", nomeSaidaBaseQry);
 
-        char *caminhoSvgFinal = montaCaminhoCompleto(dirSaida, nomeSvgFinal);
+    char *caminhoSvgFinal = montaCaminhoCompleto(dirSaida, nomeSvgFinal);
 
-        printf("Gerando SVG final: %s\n", caminhoSvgFinal);
-        FILE *svgFinal = inicializaSvg(caminhoSvgFinal, LARGURA_ARENA, ALTURA_ARENA);
+    printf("Gerando SVG final: %s\n", caminhoSvgFinal);
+    FILE *svgFinal = inicializaSvg(caminhoSvgFinal, LARGURA_ARENA, ALTURA_ARENA);
 
-        if (svgFinal != NULL) {
-            
-            iteraFormasArena(minhaArena, desenhaFormaWrapper, svgFinal); 
-            
-            // obs: Desenha o que sobrou no chão (formas remanescentes)
-            // desenhaContainerFormas(meuChao, svgFinal); 
-                        
-            fechaSvg(svgFinal);
-        } else {
-            fprintf(stderr, "AVISO: Nao foi possivel criar o SVG final em %s\n", caminhoSvgFinal);
-        }
-        
-        free(caminhoCompletoQry);
-        free(caminhoTxtQry);
-        free(caminhoSvgFinal);
+    if (svgFinal != NULL) {
+        iteraFormasArena(minhaArena, desenhaFormaWrapper, svgFinal); 
+        desenhaContainerFormas(meuChao, svgFinal); //desenha as formas q sobro
+
+        fechaSvg(svgFinal);
+    } else {
+        fprintf(stderr, "AVISO: Nao foi possivel criar o SVG final em %s\n", caminhoSvgFinal);
     }
+    
+    free(caminhoCompletoQry);
+    free(caminhoTxtQry);
+    free(caminhoSvgFinal);
+}
 
 
     // ======================= 7. LIBERAÇÃO DE MEMÓRIA =======================

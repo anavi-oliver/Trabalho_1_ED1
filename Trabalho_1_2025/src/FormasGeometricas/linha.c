@@ -119,7 +119,7 @@ void setY2Linha(Linha l, double y) {
     linha->y2 = y;
 }
 
-void setCorLinha(Linha l, char* cor) {
+void setCorLinha(Linha l, const char* cor) {
     linhaC *linha = (linhaC*) l;
     free(linha->cor);
     linha->cor = (char*) malloc((strlen(cor) + 1) * sizeof(char));

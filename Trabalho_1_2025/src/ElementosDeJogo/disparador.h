@@ -150,4 +150,16 @@ void preparaDisparo(Disparador d, char lado, int n);
 Forma dispara(Disparador d, double dx, double dy);
 
 
-#endif 
+/*
+ Reconecta o Disparador a novos Carregadores.
+ 
+ * d: O Disparador a ser reconfigurado.
+ * esq: Novo Carregador esquerdo.
+ * dir: Novo Carregador direito.
+ 
+ * Pré-condição: Todos os ponteiros devem ser válidos.
+ * Pós-condição: O Disparador agora usa os novos Carregadores.
+ */
+void reconectaCarregadores(Disparador d, Carregador esq, Carregador dir);
+
+#endif

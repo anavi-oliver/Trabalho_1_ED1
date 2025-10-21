@@ -187,9 +187,9 @@ void preparaDisparo(Disparador d, char lado, int n) {
 
     DEBUG_PRINT("DEBUG PREP: Ordem de preparo - Lado: %c, n=%d\n", ladoNormalizado, n);
 
-    // Seleciona os carregadores baseado no lado
-    Carregador carregadorOrigem = (ladoNormalizado == 'E') ? d->carregadorEsq : d->carregadorDir;
-    Carregador carregadorOposto = (ladoNormalizado == 'E') ? d->carregadorDir : d->carregadorEsq;
+    // Seleciona os carregadores baseado no lado: 'd' pega do esquerdo, 'e' pega do direito
+Carregador carregadorOrigem = (ladoNormalizado == 'D') ? d->carregadorEsq : d->carregadorDir;
+Carregador carregadorOposto = (ladoNormalizado == 'D') ? d->carregadorDir : d->carregadorEsq;
 
     // Repete a operação 'n' vezes para "ciclar" as formas
     for (int i = 0; i < n; i++) {
@@ -329,7 +329,7 @@ Queue rajadaDisparo(Disparador d, char lado, double dx, double dy,
                        getFormaX(formaDisparada),
                        getFormaY(formaDisparada));
 
-            // Insere na arena e na fila de retorno
+            // Insere na arena e na fila de  
             insereFormaArena(a, formaDisparada);
             enfileira(fila_disparos, formaDisparada);
             formas_disparadas++;

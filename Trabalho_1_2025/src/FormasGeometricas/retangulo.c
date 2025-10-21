@@ -155,7 +155,7 @@ void setAlturaRetangulo(Retangulo r, double h) {
 }
 
 //mais complexos - alocar dinamicamente
-void setCorbRetangulo(Retangulo r, char* corb) {
+void setCorbRetangulo(Retangulo r, const char* corb) {
     retanguloR *ret = (retanguloR*) r;
     free(ret->corb);
     ret->corb = (char*) malloc((strlen(corb) + 1) * sizeof(char));
@@ -166,7 +166,7 @@ void setCorbRetangulo(Retangulo r, char* corb) {
     strcpy(ret->corb, corb);
 }
 
-void setCorpRetangulo(Retangulo r, char* corp) {
+void setCorpRetangulo(Retangulo r,const char* corp) {
     retanguloR *ret = (retanguloR*) r;
     free(ret->corp);
     ret->corp = (char*) malloc((strlen(corp) + 1) * sizeof(char));
