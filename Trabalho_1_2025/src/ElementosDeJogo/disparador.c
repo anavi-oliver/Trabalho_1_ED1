@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
- #define DEBUG_MODE //apaga ou comenta pra desativar modo de debug
+// #define DEBUG_MODE //apaga ou comenta pra desativar modo de debug
 
 #ifdef DEBUG_MODE
     #define DEBUG_PRINT(...) printf(__VA_ARGS__)

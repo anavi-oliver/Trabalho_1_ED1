@@ -77,6 +77,16 @@ Retornará elemento que está no topo da pilha, ou seja, o último a ser inserid
 */
 Item topoPilha (Stack p);
 
+/*
+Retornar o tamanho da pilha
+
+p: ponteiro para a pilha
+
+A pilha não deve estar vazia
+Retornará um valor mostrando a quantidade de elementos da pilha.
+*/
+int getTamanhoPilha(Stack p);
+
 /**
  Verifica se a Pilha está vazia.
 

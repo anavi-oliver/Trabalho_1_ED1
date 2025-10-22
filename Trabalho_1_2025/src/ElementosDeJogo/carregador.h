@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include "chao.h"
 #include "formas.h"
+#include "pilha.h"
 #include "fila.h"
 
 /*_______________________ TIPO ABSTRATO DE DADOS: CARREGADOR DE FORMAS _______________________*/
@@ -13,9 +14,9 @@
  * as formas geométricas. Sua principal função é retirar formas do 'Chão',
  * que atua como um repositório geral, e armazená-las para uso posterior.
  *
- * - Como funciona: As formas são retiradas do Chão e enfileiradas
- * dentro do Carregador, seguindo uma política FIFO (o primeiro
- * que entra é o primeiro que sai).
+ * - Como funciona: As formas são retiradas do Chão e EMPILHADAS
+ * dentro do Carregador, seguindo uma política LIFO (o último
+ * que entra é o primeiro que sai) - estrutura de PILHA.
  */
 
 typedef struct Carregador_t *Carregador;
@@ -36,8 +37,7 @@ Carregador criaCarregador(int id);
 
 /*
  Libera a memória alocada para a estrutura do Carregador. Esta função
- também libera a memória da fila interna do Carregador, mas é crucial
- notar que ela **NÃO** libera a memória das formas contidas nele.
+ também libera a memória da pilha interna do Carregador, sem liberar a memória das formas contidas nele.
 
  * c: O Carregador a ser destruído.
  *
@@ -51,7 +51,7 @@ void destroiCarregador(Carregador c);
 
 /*
  Transfere uma quantidade 'n' de formas do Chão para o Carregador. As formas
- são removidas do Chão e adicionadas ao final da fila do Carregador.
+ são removidas do Chão e empilhadas no Carregador (LIFO).
 
  * carregadorAlvo: O Carregador que receberá as formas.
  * chaoOrigem: O Chão de onde as formas serão retiradas.
@@ -64,15 +64,40 @@ void destroiCarregador(Carregador c);
 void carregaFormasDoChao(Carregador carregadorAlvo, Chao chaoOrigem, int n);
 
 /*
- Remove e retorna a próxima forma na fila do Carregador (comportamento FIFO).
+ Transfere 'n' formas do Chão para o Carregador E retorna uma fila com
+ as formas que foram carregadas (para rastreamento/relatórios).
+
+ * carregadorAlvo: O Carregador que receberá as formas.
+ * chaoOrigem: O Chão de onde as formas serão retiradas.
+ * n: A quantidade de formas a serem carregadas.
+ *
+ * Pré-condição: 'carregadorAlvo' e 'chaoOrigem' devem ser ponteiros válidos.
+ * Pós-condição: Retorna uma fila contendo as formas que foram carregadas,
+ * ou uma fila vazia se nenhuma forma foi carregada.
+ */
+Queue carregaFormasDoChaoComRastreio(Carregador carregadorAlvo, Chao chaoOrigem, int n);
+
+/*
+ Remove e retorna a próxima forma no topo do Carregador (comportamento LIFO).
 
  * c: O Carregador de onde a forma será removida.
  *
  * Pré-condição: 'c' deve ser um ponteiro válido e não pode estar vazio.
- * Pós-condição: Retorna a primeira Forma da fila. Se o Carregador
+ * Pós-condição: Retorna a Forma do topo da pilha. Se o Carregador
  * estiver vazio, retorna NULL.
  */
 Forma descarregaForma(Carregador c);
+
+/*
+ Insere uma forma diretamente no Carregador (no topo da pilha).
+ 
+ * c: O Carregador que receberá a forma.
+ * f: A Forma a ser inserida.
+ 
+ * Pré-condição: 'c' e 'f' devem ser válidos.
+ * Pós-condição: A forma é adicionada ao topo do Carregador.
+ */
+void insereFormaCarregador(Carregador c, Forma f);
 
 
 /*________________________________ FUNÇÕES GET ________________________________*/
@@ -83,6 +108,7 @@ OBS: uso de const
         deixar suas intenções claras e escrever código mais robusto e de fácil manutenção.
         Agindo assim, como um guarda contra bugs acidentais ou perigosos, que as vezes pudessem passar despercebido.
 */
+
 /*
  Obtém o identificador único (ID) do Carregador.
 
@@ -113,15 +139,4 @@ int getCarregadorTamanho(const Carregador c);
  */
 bool carregadorEstaVazio(const Carregador c);
 
-/*
- Insere uma forma diretamente no Carregador (no final da fila).
- 
- * c: O Carregador que receberá a forma.
- * f: A Forma a ser inserida.
- 
- * Pré-condição: 'c' e 'f' devem ser válidos.
- * Pós-condição: A forma é adicionada ao final do Carregador.
- */
-void insereFormaCarregador(Carregador c, Forma f);
-
-#endif 
+#endif

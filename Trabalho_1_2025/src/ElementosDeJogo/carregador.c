@@ -5,7 +5,7 @@
 
 struct Carregador_t {
     int id;
-    Queue filaDeFormas; // carregador = fila
+    Stack pilhaDeFormas; // carregador = pilha de formas
 };
 
 
@@ -19,16 +19,17 @@ Carregador criaCarregador(int id){
         return NULL;
     }
 
-    // Inicializa a fila do carregador
-    c->filaDeFormas = createQueue();
-    if (c->filaDeFormas == NULL) {
-
-        printf("ERRO: Falha ao criar a fila interna do Carregador.\n");
+    c->pilhaDeFormas = createStk();
+    if (c->pilhaDeFormas == NULL) {
+        printf("ERRO: Falha ao criar a pilha interna do Carregador.\n");
         free(c);
         return NULL;
     }
 
     c->id = id;
+    
+    printf("Carregador %d criado com sucesso!\n", id);
+    
     return c;
 }
 
@@ -37,7 +38,8 @@ void destroiCarregador(Carregador c){
         return;
     }
 
-    destroiFila(c->filaDeFormas);
+    // Libera a pilha (mas não as formas)
+    destroiPilha(c->pilhaDeFormas);
 
     free(c);
 }
@@ -67,18 +69,61 @@ void carregaFormasDoChao(Carregador carregadorAlvo, Chao chaoOrigem, int n){
         //tira forma do chao
         Forma formaMovida = removeFormaChao(chaoOrigem);
 
-        //insere a forma removida no carregador
+        //insere a forma removida no carregador (empilha)
         if (formaMovida != NULL) {
-            enfileira(carregadorAlvo->filaDeFormas, formaMovida);
+            empilha(carregadorAlvo->pilhaDeFormas, formaMovida);
         }
     }//loop pra transferir n
 } //carregaFormas
+
+Queue carregaFormasDoChaoComRastreio(Carregador carregadorAlvo, Chao chaoOrigem, int n) {
+    //cria fila para rastrear formas carregadas
+    Queue filaRastreio = createQueue();
+    
+    if (filaRastreio == NULL) {
+        printf("ERRO: Falha ao criar fila de rastreio.\n");
+        return NULL;
+    }
+
+    if (carregadorAlvo == NULL || chaoOrigem == NULL) {
+        printf("AVISO: Carregador ou Chao nulo passado para carregaFormasDoChaoComRastreio.\n");
+        return filaRastreio; 
+    }
+
+    if (n <= 0) {
+        return filaRastreio; 
+    }
+
+    for (int i = 0; i < n; i++) {
+        //verifica se o chão ainda tem formas
+        if (chaoEstaVazio(chaoOrigem)) {
+            break; //chão vazio, para de carregar
+        }
+
+        //tira forma do chão
+        Forma formaMovida = removeFormaChao(chaoOrigem);
+
+        if (formaMovida != NULL) {
+            empilha(carregadorAlvo->pilhaDeFormas, formaMovida);
+            enfileira(filaRastreio, formaMovida); // registra na fila
+        }
+    }
+
+    return filaRastreio;
+}
 
 Forma descarregaForma(Carregador c) {
     if (carregadorEstaVazio(c)) {
         return NULL;
     }
-    return desenfileira(c->filaDeFormas);
+    return desempilha(c->pilhaDeFormas);
+}
+
+void insereFormaCarregador(Carregador c, Forma f) {
+    if (c == NULL || f == NULL) {
+        return;
+    }
+    empilha(c->pilhaDeFormas, f);
 }
 
 
@@ -95,21 +140,12 @@ int getCarregadorTamanho(const Carregador c) {
     if (c == NULL) {
         return 0;
     }
-    // Delega a contagem para a função da TAD Fila
-    return getTamanhoFila(c->filaDeFormas);
+    return getTamanhoPilha(c->pilhaDeFormas);
 }
 
 bool carregadorEstaVazio(const Carregador c) {
     if (c == NULL) {
-        return true; // Um carregador nulo é considerado vazio
+        return true; 
     }
-    // Delega a verificação para a função da TAD Fila
-    return estaVaziaFila(c->filaDeFormas);
-}
-
-void insereFormaCarregador(Carregador c, Forma f) {
-    if (c == NULL || f == NULL) {
-        return;
-    }
-    enfileira(c->filaDeFormas, f);
+    return estaVaziaPilha(c->pilhaDeFormas);
 }

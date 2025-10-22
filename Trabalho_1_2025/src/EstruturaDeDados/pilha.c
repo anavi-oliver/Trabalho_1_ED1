@@ -11,7 +11,7 @@ typedef struct aux {
 // estrutura da pilha
 typedef struct stack {
     AUX *top;    
-    int size;    
+    int size;    // NOVO: contador de elementos
 } pilhaC;
 
 // cria uma pilha vazia
@@ -37,7 +37,7 @@ void empilha(Stack p, Item i) {
     novo->item = i;
     novo->prox = pilha->top;  
     pilha->top = novo;        
-    pilha->size++;
+    pilha->size++;  // ATUALIZA contador
 }
 
 // remove o elemento do topo e retorna
@@ -50,7 +50,7 @@ Item desempilha(Stack p) {
     Item info = temp->item;
     pilha->top = pilha->top->prox;  
     free(temp);
-    pilha->size--;
+    pilha->size--;  // ATUALIZA contador
     return info;
 }
 
@@ -67,6 +67,14 @@ Item topoPilha(Stack p) {
 bool estaVaziaPilha(Stack p) {
     pilhaC *pilha = (pilhaC*) p;
     return (pilha->size == 0);
+}
+
+int getTamanhoPilha(Stack p) {
+    if (p == NULL) {
+        return 0;
+    }
+    pilhaC *pilha = (pilhaC*) p;
+    return pilha->size;
 }
 
 // libera toda a pilha
