@@ -193,7 +193,7 @@ void processaQry(const char *nome_path_qry, const char *nome_txt, Arena arena, C
         }
         
         //lc: Load Carregador - lc c n
-        else if (strcmp(comando, "lc") == 0) {
+    else if (strcmp(comando, "lc") == 0) {
             int id, n;
             sscanf(linha_buffer, "lc %d %d", &id, &n);
             
@@ -213,11 +213,11 @@ void processaQry(const char *nome_path_qry, const char *nome_txt, Arena arena, C
         }
         
         //atch: attach carregadores - atch d cesq cdir
-        else if (strcmp(comando, "atch") == 0) {
+else if (strcmp(comando, "atch") == 0) {
     int id_disp, id_esq, id_dir;
     sscanf(linha_buffer, "atch %d %d %d", &id_disp, &id_esq, &id_dir);
     
-    // 1. Primeiro, garante que os carregadores existem
+    // 1. Garante que os carregadores existem
     Carregador esq = encontraOuCriaCarregador(repo, id_esq);
     Carregador dir = encontraOuCriaCarregador(repo, id_dir);
     
@@ -226,7 +226,7 @@ void processaQry(const char *nome_path_qry, const char *nome_txt, Arena arena, C
         continue;
     }
     
-    // 2. Agora verifica se o disparador já existe
+    // 2. Busca o disparador (pode já ter sido posicionado com 'pd')
     RepositorioR *repo_interno = (RepositorioR *)repo;
     Disparador d = NULL;
     
@@ -236,19 +236,18 @@ void processaQry(const char *nome_path_qry, const char *nome_txt, Arena arena, C
             break;
         }
     }
-    
-    // 3. Se não existe, cria AGORA com os carregadores válidos
-    if (d == NULL) {
+        // 3. Se existe, APENAS reconecta
+    if (d != NULL) {
+        reconectaCarregadores(d, esq, dir);
+
+    } else if (d == NULL) { //se não existe, cria MANTENDO posição (0,0) temporária
         d = criaDisparador(id_disp, 0.0, 0.0, esq, dir);
+        
         if (d != NULL && repo_interno->num_disparadores < MAX_OBJETOS) {
             repo_interno->disparadores[repo_interno->num_disparadores] = d;
             repo_interno->num_disparadores++;
         }
-    } else {
-        // 4. Se já existe, reconecta (usando a função que você criou)
-        reconectaCarregadores(d, esq, dir);
-    }
-    
+    } 
     if (d != NULL) {
         fprintf(arquivo_txt, "    Disparador %d conectado: carregador %d (esq) e %d (dir)\n", 
                 id_disp, id_esq, id_dir);
