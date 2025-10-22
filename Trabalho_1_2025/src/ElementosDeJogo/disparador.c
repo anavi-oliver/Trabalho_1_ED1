@@ -25,9 +25,9 @@ struct Disparador_t {
 /*________________________________ FUNÇÕES DE CRIAÇÃO E DESTRUIÇÃO ________________________________*/
 
 Disparador criaDisparador(int id, double x, double y, Carregador esq, Carregador dir) {
-    // Pré-condição: Carregadores devem ser válidos
-    if (esq == NULL || dir == NULL) {
-        printf("ERRO: Carregadores invalidos passados para criaDisparador.\n");
+    //permite criar disparador sem carregadores (eles podem ser conectados depois com 'atch')
+    if (id < 0) {
+        printf("ERRO: ID invalido passado para criaDisparador.\n");
         return NULL;
     }
 

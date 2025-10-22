@@ -167,6 +167,9 @@ void processaQry(const char *nome_path_qry, const char *nome_txt, Arena arena, C
     
     char linha_buffer[512];
     char comando[16];
+
+
+
     
     fprintf(arquivo_txt, "_______ RELATÓRIO DE EXECUÇÃO ________ \n\n");
     
@@ -185,15 +188,16 @@ void processaQry(const char *nome_path_qry, const char *nome_txt, Arena arena, C
             sscanf(linha_buffer, "pd %d %lf %lf", &id, &x, &y);
             
             Disparador d = encontraOuCriaDisparador(repo, id);
-            if (d != NULL) {
-                setDisparadorPosicao(d, x, y);
-                fprintf(arquivo_txt, "    Disparador %d posicionado em (%.2f, %.2f)\n", id, x, y);
-                instrucoes_realizadas++;
-            }
+
+        if (d != NULL) {
+            setDisparadorPosicao(d, x, y);
+            fprintf(arquivo_txt, " Disparador %d posicionado em (%.2f, %.2f)\n", id, x, y); 
+            instrucoes_realizadas++;
         }
-        
-        //lc: Load Carregador - lc c n
-    else if (strcmp(comando, "lc") == 0) {
+
+
+        } //lc: Load Carregador - lc c n
+        else if (strcmp(comando, "lc") == 0) {
             int id, n;
             sscanf(linha_buffer, "lc %d %d", &id, &n);
             
@@ -242,7 +246,7 @@ else if (strcmp(comando, "atch") == 0) {
 
     } else if (d == NULL) { //se não existe, cria MANTENDO posição (0,0) temporária
         d = criaDisparador(id_disp, 0.0, 0.0, esq, dir);
-        
+
         if (d != NULL && repo_interno->num_disparadores < MAX_OBJETOS) {
             repo_interno->disparadores[repo_interno->num_disparadores] = d;
             repo_interno->num_disparadores++;

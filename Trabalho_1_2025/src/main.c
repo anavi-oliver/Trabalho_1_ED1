@@ -183,8 +183,8 @@ int main(int argc, char *argv[]) {
     double pontuacaoTotal = 0.0;
 
     //aumentar view
-    const double LARGURA_ARENA = 600.0; //1555
-    const double ALTURA_ARENA = 600.0; //810
+    const double LARGURA_ARENA = 1555.0; //1555
+    const double ALTURA_ARENA = 810.0; //810
  
     
     minhaArena = criaArena(LARGURA_ARENA, ALTURA_ARENA);
