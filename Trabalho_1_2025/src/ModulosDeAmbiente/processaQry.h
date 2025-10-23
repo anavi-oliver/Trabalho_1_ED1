@@ -53,12 +53,18 @@ void destroiRepositorio(Repositorio repo);
  * arena: Ponteiro para a Arena onde as formas são inseridas.
  * chao: Ponteiro para o Chão que armazena as formas iniciais.
  * pontuacao_total: Ponteiro para a variável que acumula a pontuação total.
- *
+ * formas_clonadas: Ponteiro para a variável que acumula a quantidade de formas clonadas.
+ * formas_esmagadas: Ponteiro para a variável que acumula a quantidade de formas esmagadas.
+ * 
  * Pré-condição: 'nome_path_qry', 'nome_txt', 'arena' e 'chao' devem ser válidos;
  *               'pontuacao_total' deve ser um ponteiro para uma variável double inicializada.
+ *               'formas_clonadas' e 'formas_esmagadas' devem ser um ponteiro para uma variavel
+ *                int inicializada.
  * Pós-condição: Os comandos do arquivo .qry são executados, os relatórios são
  *               gerados no arquivo .txt, e a pontuação total é atualizada.
  */
-void processaQry(const char *nome_path_qry, const char *nome_txt, Arena arena, Chao chao, double *pontuacao_total);
+void processaQry(const char *nome_path_qry, const char *nome_txt,  Arena arena, Chao chao, double *pontuacao_total, int *formas_clonadas, int *formas_esmagadas);
+
+
 
 #endif

@@ -1,3 +1,4 @@
+
 //linha 187 para o viewbox
 #include <stdio.h>
 #include <stdlib.h>
@@ -227,8 +228,9 @@ int main(int argc, char *argv[]) {
     free(caminhoSvgInicial);
 
 
-    // ======================= 6. PROCESSAMENTO DO ARQUIVO .QRY (SE EXISTIR) =======================
-// ======================= 6. PROCESSAMENTO DO ARQUIVO .QRY (SE EXISTIR) =======================
+// ======================= 6. PROCESSAMENTO DO ARQUIVO .QRY  =======================
+    int formas_clonadas = 0;
+    int formas_esmagadas = 0;
 
 if (arqQry[0] != '\0') {
     // Extrair apenas o nome do arquivo .qry (sem subdiretórios)
@@ -250,31 +252,34 @@ if (arqQry[0] != '\0') {
     char *caminhoTxtQry = montaCaminhoCompleto(dirSaida, nomeTxtQry);
     
     // Chamada principal para processar o QRY
-    processaQry(caminhoCompletoQry, caminhoTxtQry, minhaArena, meuChao, &pontuacaoTotal);
+processaQry(caminhoCompletoQry, caminhoTxtQry, minhaArena, meuChao, 
+            &pontuacaoTotal, &formas_clonadas, &formas_esmagadas);
     
-    printf("Processamento QRY concluido. Pontuacao final: %.2f\n", pontuacaoTotal);
+printf("Processamento QRY concluido.\n");
+printf("Pontuacao final: %.2f\n", pontuacaoTotal);
+printf("Formas clonadas: %d\n", formas_clonadas);
+printf("Formas esmagadas: %d\n", formas_esmagadas);
 
-    // --- Geração do SVG Final (após o QRY) ---
+
+// --- Geração do SVG Final (após o QRY) ---
     char nomeSvgFinal[MAX_FULL_PATH];
     sprintf(nomeSvgFinal, "%s.svg", nomeSaidaBaseQry);
-
     char *caminhoSvgFinal = montaCaminhoCompleto(dirSaida, nomeSvgFinal);
 
-    printf("Gerando SVG final: %s\n", caminhoSvgFinal);
+printf("Gerando SVG final: %s\n", caminhoSvgFinal);
     FILE *svgFinal = inicializaSvg(caminhoSvgFinal, LARGURA_ARENA, ALTURA_ARENA);
 
-    if (svgFinal != NULL) {
-        iteraFormasArena(minhaArena, desenhaFormaWrapper, svgFinal); 
-        desenhaContainerFormas(meuChao, svgFinal); //desenha as formas q sobro
+if (svgFinal != NULL) {
 
-        fechaSvg(svgFinal);
-    } else {
-        fprintf(stderr, "AVISO: Nao foi possivel criar o SVG final em %s\n", caminhoSvgFinal);
-    }
-    
-    free(caminhoCompletoQry);
-    free(caminhoTxtQry);
-    free(caminhoSvgFinal);
+    // PRIMEIRO: Desenha o chão (formas processadas)
+    desenhaContainerFormas(meuChao, svgFinal);
+    // DEPOIS: Desenha a arena (se ainda houver formas - geralmente vazia após calc)
+    iteraFormasArena(minhaArena, desenhaFormaWrapper, svgFinal);
+
+    fechaSvg(svgFinal);
+} else {
+    fprintf(stderr, "AVISO: Nao foi possivel criar o SVG final em %s\n", caminhoSvgFinal);
+}
 }
 
 

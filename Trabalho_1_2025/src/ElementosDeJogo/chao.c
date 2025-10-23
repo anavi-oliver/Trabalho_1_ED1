@@ -1,9 +1,8 @@
-#include "chao.h"      
-
-#include "fila.h"    
+#include "chao.h"
+#include "fila.h"
 #include "formas.h"
 
-#include <stdio.h>    
+#include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
 
@@ -15,7 +14,7 @@ struct Chao_t {
 /*________________________________ FUNÇÕES DE CRIAÇÃO E DESTRUIÇÃO ________________________________*/
 
 Chao criaChao() {
-    Chao c = (Chao) malloc(sizeof(struct Chao_t));
+    struct Chao_t *c = (struct Chao_t*) malloc(sizeof(struct Chao_t));
     if (c == NULL) {
         printf("\nERRO: Falha ao alocar memória para o Chão.\n");
         return NULL;
@@ -36,15 +35,17 @@ void destroiChao(Chao c) {
         return;
     }
 
+    struct Chao_t *chao = (struct Chao_t*) c;
 
+    // Destruir todas as formas que ainda estão no chão
     while (!chaoEstaVazio(c)) {
         Forma f = removeFormaChao(c);
         destroiForma(f);
     }
 
-    destroiFila(c->fila_de_formas);
+    destroiFila(chao->fila_de_formas);
 
-    free(c);
+    free(chao);
 }
 
 
@@ -55,8 +56,10 @@ void adicionaFormaChao(Chao c, Forma f) {
         return;
     }
 
-    //add uma forma no chão é simplesmente enfileirar na nossa fila interna.
-    enfileira(c->fila_de_formas, f);
+    struct Chao_t *chao = (struct Chao_t*) c;
+
+    // Adicionar uma forma no chão é simplesmente enfileirar na nossa fila interna
+    enfileira(chao->fila_de_formas, f);
 }
 
 Forma removeFormaChao(Chao c) {
@@ -64,8 +67,10 @@ Forma removeFormaChao(Chao c) {
         return NULL;
     }
 
-    //remover uma forma do chão é simplesmente desenfileirar da nossa fila interna
-    return (Forma) desenfileira(c->fila_de_formas);
+    struct Chao_t *chao = (struct Chao_t*) c;
+
+    // Remover uma forma do chão é simplesmente desenfileirar da nossa fila interna
+    return (Forma) desenfileira(chao->fila_de_formas);
 }
 
 
@@ -73,9 +78,11 @@ Forma removeFormaChao(Chao c) {
 
 bool chaoEstaVazio(const Chao c) {
     if (c == NULL) {
-        return true; //um chão que não existe pode ser considerado vazio
+        return true; // Um chão que não existe pode ser considerado vazio
     }
-    return estaVaziaFila(c->fila_de_formas);
+    
+    struct Chao_t *chao = (struct Chao_t*) c;
+    return estaVaziaFila(chao->fila_de_formas);
 }
 
 int getChaoTamanho(const Chao c) {
@@ -83,5 +90,6 @@ int getChaoTamanho(const Chao c) {
         return 0;
     }
     
-    return getTamanhoFila(c->fila_de_formas);
+    struct Chao_t *chao = (struct Chao_t*) c;
+    return getTamanhoFila(chao->fila_de_formas);
 }

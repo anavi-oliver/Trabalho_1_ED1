@@ -2,14 +2,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-// #define DEBUG_MODE //apaga ou comenta pra desativar modo de debug
+// #define DEBUG_MODE //descomente para ativar modo de debug
 
 #ifdef DEBUG_MODE
     #define DEBUG_PRINT(...) printf(__VA_ARGS__)
 #else
     #define DEBUG_PRINT(...) // Não faz nada quando debug está desativado
-
-    #endif
+#endif
 
 /*_______________________ ESTRUTURA INTERNA DO DISPARADOR _______________________*/
 struct Disparador_t {
@@ -25,14 +24,8 @@ struct Disparador_t {
 /*________________________________ FUNÇÕES DE CRIAÇÃO E DESTRUIÇÃO ________________________________*/
 
 Disparador criaDisparador(int id, double x, double y, Carregador esq, Carregador dir) {
-    //permite criar disparador sem carregadores (eles podem ser conectados depois com 'atch')
-    if (id < 0) {
-        printf("ERRO: ID invalido passado para criaDisparador.\n");
-        return NULL;
-    }
-
-    // Aloca memória para a estrutura do Disparador
-    Disparador d = malloc(sizeof(struct Disparador_t));
+    // Permite criar disparador sem carregadores (conectados depois com 'atch')
+    struct Disparador_t *d = malloc(sizeof(struct Disparador_t));
     if (d == NULL) {
         printf("ERRO: Falha ao alocar memoria para o Disparador.\n");
         return NULL;
@@ -42,13 +35,13 @@ Disparador criaDisparador(int id, double x, double y, Carregador esq, Carregador
     d->id = id;
     d->x = x;
     d->y = y;
-    d->carregadorEsq = esq;
-    d->carregadorDir = dir;
+    d->carregadorEsq = esq;  // Pode ser NULL inicialmente
+    d->carregadorDir = dir;  // Pode ser NULL inicialmente
     d->formaPronta = NULL;
 
     DEBUG_PRINT("Disparador %d criado com sucesso!\n", d->id);
 
-    return d;
+    return (Disparador)d;
 }
 
 void destroiDisparador(Disparador d) {
@@ -56,14 +49,16 @@ void destroiDisparador(Disparador d) {
         return;
     }
 
-    // Se houver uma forma na posição de disparo, avisa e libera
-    if (d->formaPronta != NULL) {
+    struct Disparador_t *disp = (struct Disparador_t *)d;
+
+    // Se houver uma forma na posição de disparo, libera
+    if (disp->formaPronta != NULL) {
         DEBUG_PRINT("AVISO: Disparador %d tinha forma ID=%d em posicao de disparo nao utilizada\n",
-                   d->id, getFormaId(d->formaPronta));
-        destroiForma(d->formaPronta);
+                   disp->id, getFormaId(disp->formaPronta));
+        destroiForma(disp->formaPronta);
     }
 
-    free(d);
+    free(disp);
 }
 
 
@@ -73,28 +68,32 @@ int getDisparadorId(const Disparador d) {
     if (d == NULL) {
         return -1;
     }
-    return d->id;
+    struct Disparador_t *disp = (struct Disparador_t *)d;
+    return disp->id;
 }
 
 double getDisparadorX(const Disparador d) {
     if (d == NULL) {
         return 0.0;
     }
-    return d->x;
+    struct Disparador_t *disp = (struct Disparador_t *)d;
+    return disp->x;
 }
 
 double getDisparadorY(const Disparador d) {
     if (d == NULL) {
         return 0.0;
     }
-    return d->y;
+    struct Disparador_t *disp = (struct Disparador_t *)d;
+    return disp->y;
 }
 
 Forma getDisparadorFormaPronta(const Disparador d) {
     if (d == NULL) {
         return NULL;
     }
-    return d->formaPronta;
+    struct Disparador_t *disp = (struct Disparador_t *)d;
+    return disp->formaPronta;
 }
 
 
@@ -105,25 +104,14 @@ void setDisparadorPosicao(Disparador d, double x, double y) {
         printf("AVISO: Disparador nulo passado para setDisparadorPosicao.\n");
         return;
     }
-    d->x = x;
-    d->y = y;
+    struct Disparador_t *disp = (struct Disparador_t *)d;
+    disp->x = x;
+    disp->y = y;
 }
 
 
 /*________________________________ FUNÇÕES AUXILIARES ADICIONAIS ________________________________*/
 
-/*
- Reconecta o Disparador a novos Carregadores. Útil para reconfigurar
- o sistema de munição dinamicamente.
- 
- * d: O Disparador a ser reconfigurado.
- * esq: Novo Carregador esquerdo.
- * dir: Novo Carregador direito.
- 
- * Pré-condição: Todos os ponteiros devem ser válidos.
- * Pós-condição: O Disparador agora usa os novos Carregadores.
- * A forma em posição de disparo é mantida.
- */
 void reconectaCarregadores(Disparador d, Carregador esq, Carregador dir) {
     if (d == NULL) {
         printf("ERRO: Disparador NULL passado para reconectaCarregadores.\n");
@@ -135,33 +123,13 @@ void reconectaCarregadores(Disparador d, Carregador esq, Carregador dir) {
         return;
     }
 
+    struct Disparador_t *disp = (struct Disparador_t *)d;
+
     DEBUG_PRINT("DEBUG ATTACH: Disparador %d reconectado: esq=%d, dir=%d\n",
-                d->id, getCarregadorId(esq), getCarregadorId(dir));
+                disp->id, getCarregadorId(esq), getCarregadorId(dir));
 
-    d->carregadorEsq = esq;
-    d->carregadorDir = dir;
-}
-
-/*
- Limpa a forma da posição de disparo sem destruí-la. Útil quando
- a forma precisa ser movida para outro lugar sem ser disparada.
- 
- * d: O Disparador.
- * f: A Forma a ser removida (deve ser a mesma que está em disparo).
- 
- * Pré-condição: 'd' e 'f' devem ser válidos.
- * Pós-condição: Se 'f' estava em posição de disparo, é removida.
- */
-void limpaFormaPronta(Disparador d, Forma f) {
-    if (d == NULL || f == NULL) {
-        return;
-    }
-
-    if (d->formaPronta == f) {
-        DEBUG_PRINT("DEBUG LIMPA: Removendo forma ID=%d da posicao de disparo do disparador ID=%d\n",
-                   getFormaId(f), d->id);
-        d->formaPronta = NULL;
-    }
+    disp->carregadorEsq = esq;
+    disp->carregadorDir = dir;
 }
 
 
@@ -169,6 +137,14 @@ void limpaFormaPronta(Disparador d, Forma f) {
 
 void preparaDisparo(Disparador d, char lado, int n) {
     if (d == NULL) {
+        return;
+    }
+
+    struct Disparador_t *disp = (struct Disparador_t *)d;
+
+    // Valida carregadores
+    if (disp->carregadorEsq == NULL || disp->carregadorDir == NULL) {
+        printf("ERRO: Disparador %d não possui carregadores conectados.\n", disp->id);
         return;
     }
 
@@ -187,24 +163,24 @@ void preparaDisparo(Disparador d, char lado, int n) {
 
     DEBUG_PRINT("DEBUG PREP: Ordem de preparo - Lado: %c, n=%d\n", ladoNormalizado, n);
 
-    // Seleciona os carregadores baseado no lado: 'd' pega do esquerdo, 'e' pega do direito
-Carregador carregadorOrigem = (ladoNormalizado == 'D') ? d->carregadorEsq : d->carregadorDir;
-Carregador carregadorOposto = (ladoNormalizado == 'D') ? d->carregadorDir : d->carregadorEsq;
+    // ========== CORREÇÃO CRÍTICA: Lógica de seleção de carregadores ==========
+    // 'D' (direito) → pega do carregador ESQUERDO
+    // 'E' (esquerdo) → pega do carregador DIREITO
+    Carregador carregadorOrigem = (ladoNormalizado == 'D') ? disp->carregadorEsq : disp->carregadorDir;
+    Carregador carregadorOposto = (ladoNormalizado == 'D') ? disp->carregadorDir : disp->carregadorEsq;
 
     // Repete a operação 'n' vezes para "ciclar" as formas
     for (int i = 0; i < n; i++) {
         DEBUG_PRINT("DEBUG PREP: Iteracao %d - Forma atual em disparo: %p\n", 
-                   i, (void*)d->formaPronta);
+                   i, (void*)disp->formaPronta);
 
         // Se já há uma forma pronta, move ela para o carregador oposto
-        if (d->formaPronta != NULL) {
+        if (disp->formaPronta != NULL) {
             DEBUG_PRINT("DEBUG PREP: Movendo forma ID=%d do disparo para carregador oposto\n",
-                       getFormaId(d->formaPronta));
+                       getFormaId(disp->formaPronta));
             
-            // Você precisa implementar esta função no carregador.c:
-            // void insereFormaCarregador(Carregador c, Forma f);
-            insereFormaCarregador(carregadorOposto, d->formaPronta);
-            d->formaPronta = NULL;
+            insereFormaCarregador(carregadorOposto, disp->formaPronta);
+            disp->formaPronta = NULL;
         }
 
         // Verifica se o carregador de origem tem formas
@@ -214,11 +190,11 @@ Carregador carregadorOposto = (ladoNormalizado == 'D') ? d->carregadorDir : d->c
         }
 
         // Pega a próxima forma do carregador de origem
-        d->formaPronta = descarregaForma(carregadorOrigem);
+        disp->formaPronta = descarregaForma(carregadorOrigem);
         
-        if (d->formaPronta != NULL) {
+        if (disp->formaPronta != NULL) {
             DEBUG_PRINT("DEBUG PREP: Forma ID=%d colocada em posicao de disparo\n",
-                       getFormaId(d->formaPronta));
+                       getFormaId(disp->formaPronta));
         }
     }
 }
@@ -229,26 +205,28 @@ Forma dispara(Disparador d, double dx, double dy) {
         return NULL;
     }
 
-    DEBUG_PRINT("DEBUG DISP: Tentando disparar. formaPronta=%p\n", (void*)d->formaPronta);
+    struct Disparador_t *disp = (struct Disparador_t *)d;
+
+    DEBUG_PRINT("DEBUG DISP: Tentando disparar. formaPronta=%p\n", (void*)disp->formaPronta);
     
-    if (d->formaPronta != NULL) {
+    if (disp->formaPronta != NULL) {
         DEBUG_PRINT("DEBUG DISP: Forma ID=%d esta em posicao de disparo\n", 
-                   getFormaId(d->formaPronta));
+                   getFormaId(disp->formaPronta));
     }
 
     // Verifica se há uma forma pronta para disparo
-    if (d->formaPronta == NULL) {
+    if (disp->formaPronta == NULL) {
         printf("AVISO: Nenhuma forma esta na posicao de disparo.\n");
         return NULL;
     }
 
     // Pega a forma que será disparada
-    Forma formaDisparada = d->formaPronta;
-    d->formaPronta = NULL;
+    Forma formaDisparada = disp->formaPronta;
+    disp->formaPronta = NULL;
 
     // Calcula a posição final da forma
-    double posX_final = d->x + dx;
-    double posY_final = d->y + dy;
+    double posX_final = disp->x + dx;
+    double posY_final = disp->y + dy;
 
     // Atualiza a posição da forma
     setFormaPosicao(formaDisparada, posX_final, posY_final);
@@ -257,89 +235,4 @@ Forma dispara(Disparador d, double dx, double dy) {
                getFormaId(formaDisparada), posX_final, posY_final);
 
     return formaDisparada;
-}
-
-
-/*________________________________ FUNÇÃO AVANÇADA: RAJADA ________________________________*/
-
-/*
- Dispara múltiplas formas em sequência, criando um padrão de tiro.
- A cada disparo, o deslocamento aumenta segundo os incrementos (ix, iy).
- 
- * d: O Disparador que executará a rajada.
- * lado: De qual Carregador pegar as formas ('E' ou 'D').
- * dx, dy: Deslocamento inicial do primeiro disparo.
- * ix, iy: Incremento de deslocamento a cada novo disparo.
- * a: A Arena onde as formas serão inseridas.
- 
- * Pré-condição: 'd' e 'a' devem ser válidos.
- * Pós-condição: Retorna uma fila com todas as formas disparadas.
- * As formas são automaticamente inseridas na Arena.
- */
-Queue rajadaDisparo(Disparador d, char lado, double dx, double dy, 
-                    double ix, double iy, Arena a) {
-    if (d == NULL || a == NULL) {
-        printf("ERRO: Parametros nulos passados para rajadaDisparo.\n");
-        return NULL;
-    }
-
-    // Salva a posição original do disparador
-    double x_original = d->x;
-    double y_original = d->y;
-
-    // Cria fila para armazenar as formas disparadas
-    Queue fila_disparos = createQueue();
-    if (fila_disparos == NULL) {
-        printf("ERRO: Falha ao criar fila de disparos.\n");
-        return NULL;
-    }
-
-    int formas_disparadas = 0;
-
-    DEBUG_PRINT("DEBUG RAJADA: Iniciando rajada. Posicao original: (%.2f, %.2f)\n", 
-               x_original, y_original);
-    DEBUG_PRINT("DEBUG RAJADA: dx=%.2f, dy=%.2f, ix=%.2f, iy=%.2f\n", dx, dy, ix, iy);
-
-    // Loop infinito - para quando acabar a munição
-    for (int i = 0; ; i++) {
-        DEBUG_PRINT("DEBUG RAJADA: Iteracao %d\n", i);
-
-        // Prepara a próxima forma
-        preparaDisparo(d, lado, 1);
-        
-        // Se não há forma pronta, acabou a munição
-        if (d->formaPronta == NULL) {
-            DEBUG_PRINT("DEBUG RAJADA: Fim da rajada - carregador vazio\n");
-            break;
-        }
-
-        // Calcula o deslocamento atual (aumenta a cada iteração)
-        double dx_atual = dx + (i * ix);
-        double dy_atual = dy + (i * iy);
-
-        DEBUG_PRINT("DEBUG RAJADA: Deslocamento para forma %d: (%.2f, %.2f)\n",
-                   getFormaId(d->formaPronta), dx_atual, dy_atual);
-
-        // Dispara a forma
-        Forma formaDisparada = dispara(d, dx_atual, dy_atual);
-
-        if (formaDisparada != NULL) {
-            DEBUG_PRINT("DEBUG RAJADA: Forma %d disparada para (%.2f, %.2f)\n",
-                       getFormaId(formaDisparada),
-                       getFormaX(formaDisparada),
-                       getFormaY(formaDisparada));
-
-            // Insere na arena e na fila de  
-            insereFormaArena(a, formaDisparada);
-            enfileira(fila_disparos, formaDisparada);
-            formas_disparadas++;
-        }
-    }
-
-    // Restaura a posição original do disparador
-    setDisparadorPosicao(d, x_original, y_original);
-
-    DEBUG_PRINT("DEBUG RAJADA: Rajada completa. %d formas disparadas\n", formas_disparadas);
-    
-    return fila_disparos;
 }

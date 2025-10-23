@@ -35,6 +35,13 @@ bool formasSobrepoem(Forma f1, Forma f2);
 
 
 /*                    FUNÇÕES ESPECIALISTAS DE SOBREPOSIÇÃO                    */
+/*
+* c, c1 e c2: ponteiros para os circulos comparados.
+* r, r1, r2: ponteiros para os retangulos comparados.
+* t, t1, t2: ponteiros para os textos comparados.
+* l, l1, l2: ponteiros para as linhas comparadas.
+*
+*/
 
 // Verifica sobreposição entre dois círculos
 bool sobreposicaoCirculoCirculo(Circulo c1, Circulo c2);

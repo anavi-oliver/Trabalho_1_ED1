@@ -3,8 +3,10 @@
 
 #include <stdio.h>
 #include <stdbool.h>
-#include "fila.h"
+
+#include "../EstruturaDeDados/fila.h"
 #include "formas.h"
+#include "chao.h"
 
 /*_______________________ TIPO ABSTRATO DE DADOS: ARENA (PALCO PRINCIPAL) _______________________*/
 /*
@@ -23,7 +25,7 @@
  *
  */
 
-typedef struct Arena_t *Arena;
+typedef void *Arena;
 
 
 /*________________________________ FUNÇÕES DE CRIAÇÃO E DESTRUIÇÃO ________________________________*/
@@ -68,6 +70,17 @@ void destroiArena(Arena a);
 void insereFormaArena(Arena a, Forma f);
 
 /*
+  Remove e retorna a próxima forma da arena (fila), assim a primeira que foi inserida
+   na arena será a primeira a ser retirada.
+
+ * a: A Arena a ter a forma retirada.
+ *
+ * Pré-condição: 'a' deve ser um ponteiro válido para uma Arena.
+ * Pós-condição: A memória da forma especifica é liberada.
+ */
+Forma removeFormaArena(Arena a);
+
+/*
  Itera sobre todas as formas contidas na Arena e executa uma função para cada uma.
  Esta é uma forma segura e encapsulada de processar todos os elementos da Arena.
 
@@ -81,6 +94,41 @@ void insereFormaArena(Arena a, Forma f);
  */
 void iteraFormasArena(const Arena a, void (*executa)(Forma f, void *auxData), void *auxData);
 
+
+/*________________________________ PROCESSAMENTO DE INTERAÇÕES ________________________________*/
+
+/**
+ * Processa todas as interações entre formas na arena seguindo regras de colisão
+ * 
+ * Algoritmo:
+ * 1. Enquanto houver pelo menos 2 formas na arena:
+ *    - Remove duas formas (I e J) da arena na ordem FIFO
+ *    - Verifica se há sobreposição entre elas
+ * 
+ * 2. Se NÃO há sobreposição:
+ *    - Ambas as formas voltam ao chão na mesma ordem
+ * 
+ * 3. Se HÁ sobreposição e área(I) < área(J):
+ *    - Forma I é ESMAGADA (destruída completamente)
+ *    - Forma J volta sozinha ao chão
+ *    - Incrementa contador de formas esmagadas
+ *    - Adiciona área de I à pontuação total
+ * 
+ * 4. Se HÁ sobreposição e área(I) >= área(J):
+ *    - Forma I modifica as cores de J:
+ *      * Cor de borda de J = cor de preenchimento de I
+ *      * Cor de preenchimento de J = cor de borda de I
+ *    - Ordem de retorno ao chão: J, depois I, depois clone de I
+ *    - Forma I é clonada com cores invertidas (borda↔preenchimento)
+ *    - Incrementa contador de formas clonadas
+ * 
+ *  a:  Arena contendo as formas a serem processadas
+ *  chao:  Chão onde as formas serão devolvidas após processamento
+ *  arquivo_txt:  Arquivo para log das interações (pode ser NULL)
+ *  formas_clonadas:  Ponteiro para contador de formas clonadas (pode ser NULL)
+ *  formas_esmagadas: Ponteiro para contador de formas esmagadas (pode ser NULL)
+ */
+void processaInteracoesArena(Arena a, Chao chao, double *pontuacao_total, Queue anotacoes_svg, FILE *arquivo_txt, int *formas_clonadas, int *formas_esmagadas, void *repo);
 
 /*___________________________ FUNÇÕES DE CONSULTA E MODIFICAÇÃO DE ATRIBUTOS ___________________________*/
 
@@ -105,6 +153,16 @@ double getArenaLargura(const Arena a);
 double getArenaAltura(const Arena a);
 
 /*
+ Retorna a quantidade de formas atualmente ativas na Arena.
+
+ * a: Ponteiro para a Arena.
+ *
+ * Pré-condição: 'a' deve ser um ponteiro válido.
+ * Pós-condição: Retorna o número de formas contidas na Arena.
+ */
+int getArenaNumFormas(const Arena a);
+
+/*
  Define uma nova largura para a Arena.
 
  * a: Ponteiro para a Arena a ser modificada.
@@ -126,14 +184,6 @@ void setArenaLargura(Arena a, double novaLargura);
  */
 void setArenaAltura(Arena a, double novaAltura);
 
-/*
- Retorna a quantidade de formas atualmente ativas na Arena.
 
- * a: Ponteiro para a Arena.
- *
- * Pré-condição: 'a' deve ser um ponteiro válido.
- * Pós-condição: Retorna o número de formas contidas na Arena.
- */
-int getArenaNumFormas(const Arena a);
 
 #endif 

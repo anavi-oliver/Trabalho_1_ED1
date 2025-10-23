@@ -27,7 +27,7 @@ typedef enum {
 } TipoForma;
 
 // Este ponteiro apontará para uma struct que contém o ID, o Tipo e os dados específicos (void*).
-typedef struct Forma_t *Forma;
+typedef void *Forma;
 
 
 /*________________________________ FUNÇÕES DE CRIAÇÃO E DESTRUIÇÃO ________________________________*/
@@ -127,6 +127,16 @@ Obtém o ponteiro para os dados específicos da forma (o objeto Circulo, Retangu
 * Pós-condição: Retorna o ponteiro void* para os dados específicos.
 */
 void* getFormaAssoc(const Forma f);
+
+/*
+Obtem a área da forma
+
+* f: Ponteiro para a forma.
+*
+* Pré-condição: 'f' deve ser um ponteiro válido.
+* Pós-condição: Retorna o valor da área da forma como double.
+*/
+double getFormaArea(const Forma f);
 
 
 /*________________________________ FUNÇÕES DE MODIFICAÇÃO (SETTERS) ________________________________*/

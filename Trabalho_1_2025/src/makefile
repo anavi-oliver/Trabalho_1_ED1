@@ -1,64 +1,39 @@
-PROJ_NAME=ted
+# ======================= CONFIGURAÇÕES GERAIS =======================
 
-ALUNO=Ana Vitoria Oliver Machado
-LIBS=-lm
+PROJ_NAME = ted
+CC = gcc
+
+# Flags de compilação
+CFLAGS = -g -Wall -Wextra -O0 -std=c99 -fstack-protector-all -Werror=implicit-function-declaration
+
+# Flags de linkagem
+LDFLAGS = -lm
+
+# Busca automaticamente todos os diretórios e fontes
+SRC_DIRS := $(shell find . -type d)
 SOURCES := $(shell find . -name '*.c')
-OBJETOS := $(SOURCES:.c=.o)
+OBJECTS := $(SOURCES:.c=.o)
 
-CC=gcc
+# Gera automaticamente os includes (-I)
+INCLUDES := $(patsubst %,-I%,$(SRC_DIRS))
 
-INCLUDE_DIRS := $(shell find . -type d)
-INCLUDES := $(patsubst %,-I%,$(INCLUDE_DIRS))
+# ======================= REGRAS PADRÃO =======================
 
-#flags de compilação
-CFLAGS=-ggdb -O0 -std=c99 -fstack-protector-all -Werror=implicit-function-declaration -Wall -Wextra $(INCLUDES)
+.PHONY: all clean ted run test1 test2
 
-#flags de linkagem
-LDFLAGS=-O0
-
-.PHONY: all clean ted
-
-#atalho para ted
+# Compila tudo e gera o executável
 all: ted
 
-ted: $(OBJETOS)
-	$(CC) -o $(PROJ_NAME) $(LDFLAGS) $(OBJETOS) $(LIBS)
+ted: $(OBJECTS)
+	$(CC) -o $(PROJ_NAME) $(OBJECTS) $(LDFLAGS)
 	@echo "Executável '$(PROJ_NAME)' criado com sucesso!"
 
-#regra genérica para transformar qualquer .c em .o
-%.o : %.c
-	$(CC) -c $(CFLAGS) $< -o $@
+# Regra genérica de compilação (.c → .o)
+%.o: %.c
+	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
 
-#regra para limpar os arquivos gerados
+# Limpa todos os objetos e o executável
 clean:
 	find . -name '*.o' -delete
 	rm -f $(PROJ_NAME)
-	@echo "Arquivos compilados foram removidos."
-
-#listar dependencias - os #include 
-
-#elementos de jogo
-ElementosDeJogo/arena.o: ElementosDeJogo/arena.c ElementosDeJogo/arena.h EstruturaDeDados/fila.h FormasGeometricas/formas.h FormasGeometricas/circulo.h FormasGeometricas/linha.h FormasGeometricas/retangulo.h FormasGeometricas/texto.h
-ElementosDeJogo/carregador.o: ElementosDeJogo/carregador.c ElementosDeJogo/carregador.h ElementosDeJogo/chao.h EstruturaDeDados/fila.h FormasGeometricas/formas.h FormasGeometricas/circulo.h FormasGeometricas/linha.h FormasGeometricas/retangulo.h FormasGeometricas/texto.h
-ElementosDeJogo/chao.o: ElementosDeJogo/chao.c ElementosDeJogo/chao.h EstruturaDeDados/fila.h FormasGeometricas/formas.h FormasGeometricas/circulo.h FormasGeometricas/linha.h FormasGeometricas/retangulo.h FormasGeometricas/texto.h
-ElementosDeJogo/disparador.o: ElementosDeJogo/disparador.c ElementosDeJogo/disparador.h ElementosDeJogo/carregador.h ElementosDeJogo/chao.h EstruturaDeDados/fila.h FormasGeometricas/formas.h FormasGeometricas/circulo.h FormasGeometricas/linha.h FormasGeometricas/retangulo.h FormasGeometricas/texto.h ElementosDeJogo/arena.h
-ElementosDeJogo/sobreposicao.o: ElementosDeJogo/sobreposicao.c ElementosDeJogo/sobreposicao.h FormasGeometricas/formas.h FormasGeometricas/circulo.h FormasGeometricas/linha.h FormasGeometricas/retangulo.h FormasGeometricas/texto.h
-
-#estrutura de dados
-EstruturaDeDados/fila.o: EstruturaDeDados/fila.c EstruturaDeDados/fila.h 
-EstruturaDeDados/pilha.o: EstruturaDeDados/pilha.c EstruturaDeDados/pilha.h
-
-#formas geometricas
-FormasGeometricas/circulo.o: FormasGeometricas/circulo.c FormasGeometricas/circulo.h
-FormasGeometricas/formas.o: FormasGeometricas/formas.c FormasGeometricas/formas.h FormasGeometricas/circulo.h FormasGeometricas/linha.h FormasGeometricas/retangulo.h FormasGeometricas/texto.h
-FormasGeometricas/linha.o: FormasGeometricas/linha.c FormasGeometricas/linha.h
-FormasGeometricas/retangulo.o: FormasGeometricas/retangulo.c FormasGeometricas/retangulo.h
-FormasGeometricas/texto.o: FormasGeometricas/texto.c FormasGeometricas/texto.h
-
-#modulos de ambiente
-ModulosDeAmbiente/processaGeo.o: ModulosDeAmbiente/processaGeo.c ModulosDeAmbiente/processaGeo.h ElementosDeJogo/chao.h FormasGeometricas/formas.h FormasGeometricas/circulo.h FormasGeometricas/linha.h FormasGeometricas/retangulo.h FormasGeometricas/texto.h
-ModulosDeAmbiente/processaQry.o: ModulosDeAmbiente/processaQry.c ModulosDeAmbiente/processaQry.h ElementosDeJogo/disparador.h ElementosDeJogo/carregador.h ElementosDeJogo/chao.h EstruturaDeDados/fila.h FormasGeometricas/formas.h ElementosDeJogo/arena.h FormasGeometricas/circulo.h FormasGeometricas/linha.h FormasGeometricas/retangulo.h FormasGeometricas/texto.h
-ModulosDeAmbiente/svg.o: ModulosDeAmbiente/svg.c ModulosDeAmbiente/svg.h EstruturaDeDados/fila.h FormasGeometricas/formas.h FormasGeometricas/circulo.h FormasGeometricas/linha.h FormasGeometricas/retangulo.h FormasGeometricas/texto.h
-
-#main
-main.o: main.c ElementosDeJogo/arena.h ElementosDeJogo/chao.h FormasGeometricas/formas.h ModulosDeAmbiente/svg.h ModulosDeAmbiente/processaGeo.h ModulosDeAmbiente/processaQry.h
+	@echo "Limpeza concluída."

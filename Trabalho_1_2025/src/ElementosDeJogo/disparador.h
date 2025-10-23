@@ -2,6 +2,7 @@
 #define DISPARADOR_H
 
 #include <stdbool.h>
+
 #include "formas.h"
 #include "carregador.h"
 #include "arena.h"
@@ -27,7 +28,7 @@
  * posição de disparo.
  */
 
-typedef struct Disparador_t *Disparador;
+typedef void *Disparador;
 
 
 /*________________________________ FUNÇÕES DE CRIAÇÃO E DESTRUIÇÃO ________________________________*/

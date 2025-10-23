@@ -3,7 +3,10 @@
 
 #include <stdio.h>
 #include <stdbool.h>
+#include <math.h>
+
 #include "formas.h"
+
 
 /*_______________________ TIPO ABSTRATO DE DADOS: CHÃO (REPOSITÓRIO DE FORMAS) _______________________*/
 /*
@@ -21,7 +24,7 @@
 * - A definição completa da struct está encapsulada no arquivo chao.c.
 */
 
-typedef struct Chao_t *Chao;
+typedef void *Chao;
 
 
 /*________________________________ FUNÇÕES DE CRIAÇÃO E DESTRUIÇÃO ________________________________*/

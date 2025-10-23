@@ -17,11 +17,11 @@
 * - 'dados_especificos': O ponteiro void* que aponta para a struct da forma
 * específica (um Círculo, Retângulo, etc.).
 */
-struct Forma_t {
+typedef struct {
     int id;
     TipoForma tipo;
     void *dados_especificos;
-};
+} FormaInterno;
 
 
 /*________________________________ FUNÇÕES DE CRIAÇÃO E DESTRUIÇÃO ________________________________*/
@@ -33,7 +33,7 @@ Forma criaForma(int id, TipoForma tipo, void *dados_especificos) {
     }
 
     // Aloca memória para a nossa estrutura genérica (o "invólucro")
-    Forma f = (Forma) malloc(sizeof(struct Forma_t));
+    FormaInterno *f = (FormaInterno*) malloc(sizeof(FormaInterno));
     if (!f) {
         printf("\nERRO: Falha ao alocar memória para a forma genérica!\n");
         return NULL;
@@ -44,7 +44,7 @@ Forma criaForma(int id, TipoForma tipo, void *dados_especificos) {
     f->tipo = tipo;
     f->dados_especificos = dados_especificos;
 
-    return f;
+    return (Forma)f;
 }
 
 void destroiForma(Forma f) {
@@ -52,24 +52,26 @@ void destroiForma(Forma f) {
         return;
     }
 
+    FormaInterno *forma = (FormaInterno*)f;
+
     // Antes de liberar o invólucro, precisamos liberar a forma específica que está dentro dele.
     // Usamos o 'tipo' para saber qual função de destruição chamar.
-    switch (f->tipo) {
+    switch (forma->tipo) {
         case TIPO_CIRCULO:
-            destroiCirculo(f->dados_especificos);
+            destroiCirculo(forma->dados_especificos);
             break;
         case TIPO_RETANGULO:
-            destroiRetangulo(f->dados_especificos);
+            destroiRetangulo(forma->dados_especificos);
             break;
         case TIPO_LINHA:
-            destroiLinha(f->dados_especificos);
+            destroiLinha(forma->dados_especificos);
             break;
         case TIPO_TEXTO:
-            destroiTexto(f->dados_especificos);
+            destroiTexto(forma->dados_especificos);
             break;
     }
 
-    free(f);
+    free(forma);
 }
 
 
@@ -79,7 +81,8 @@ int getFormaId(const Forma f) {
     if (!f) {
         return -1; // Retorna um ID inválido em caso de erro
     }
-    return f->id;
+    FormaInterno *forma = (FormaInterno*)f;
+    return forma->id;
 }
 
 TipoForma getFormaTipo(const Forma f) {
@@ -87,7 +90,8 @@ TipoForma getFormaTipo(const Forma f) {
     if (!f) {
         return -1; 
     }
-    return f->tipo;
+    FormaInterno *forma = (FormaInterno*)f;
+    return forma->tipo;
 }
 
 double getFormaX(const Forma f) {
@@ -95,16 +99,18 @@ double getFormaX(const Forma f) {
         return 0.0;
     }
 
+    FormaInterno *forma = (FormaInterno*)f;
+
     // chama função getX específica de cada tipo de forma
-    switch (f->tipo) {
+    switch (forma->tipo) {
         case TIPO_CIRCULO:   
-            return getXCirculo(f->dados_especificos);
+            return getXCirculo(forma->dados_especificos);
         case TIPO_RETANGULO: 
-            return getXRetangulo(f->dados_especificos);
+            return getXRetangulo(forma->dados_especificos);
         case TIPO_LINHA:     
-            return getX1Linha(f->dados_especificos); // Âncora da linha é o ponto 1
+            return getX1Linha(forma->dados_especificos); // Âncora da linha é o ponto 1
         case TIPO_TEXTO:     
-            return getXTexto(f->dados_especificos);
+            return getXTexto(forma->dados_especificos);
     }
     return 0.0;
 }
@@ -114,16 +120,18 @@ double getFormaY(const Forma f) {
         return 0.0;
     }
 
+    FormaInterno *forma = (FormaInterno*)f;
+
     // chama a função getY específica de cada tipo de forma
-    switch (f->tipo) {
+    switch (forma->tipo) {
         case TIPO_CIRCULO:   
-            return getYCirculo(f->dados_especificos);
+            return getYCirculo(forma->dados_especificos);
         case TIPO_RETANGULO: 
-            return getYRetangulo(f->dados_especificos);
+            return getYRetangulo(forma->dados_especificos);
         case TIPO_LINHA:     
-            return getY1Linha(f->dados_especificos);
+            return getY1Linha(forma->dados_especificos);
         case TIPO_TEXTO:     
-            return getYTexto(f->dados_especificos);
+            return getYTexto(forma->dados_especificos);
     }
     return 0.0;
 }
@@ -133,15 +141,17 @@ char *getFormaCorBorda(const Forma f) {
         return NULL;
     }
 
-    switch (f->tipo) {
+    FormaInterno *forma = (FormaInterno*)f;
+
+    switch (forma->tipo) {
         case TIPO_CIRCULO:   
-            return getCorbCirculo(f->dados_especificos);
+            return getCorbCirculo(forma->dados_especificos);
         case TIPO_RETANGULO: 
-            return getCorbRetangulo(f->dados_especificos);
+            return getCorbRetangulo(forma->dados_especificos);
         case TIPO_LINHA:     
-            return getCorLinha(f->dados_especificos); // Linha só tem uma cor
+            return getCorLinha(forma->dados_especificos); // Linha só tem uma cor
         case TIPO_TEXTO:     
-            return getCorbTexto(f->dados_especificos);
+            return getCorbTexto(forma->dados_especificos);
     }
     return NULL;
 }
@@ -151,15 +161,17 @@ char *getFormaCorPreenchimento(const Forma f) {
         return NULL;
     }
 
-    switch (f->tipo) {
+    FormaInterno *forma = (FormaInterno*)f;
+
+    switch (forma->tipo) {
         case TIPO_CIRCULO:   
-            return getCorpCirculo(f->dados_especificos);
+            return getCorpCirculo(forma->dados_especificos);
         case TIPO_RETANGULO: 
-            return getCorpRetangulo(f->dados_especificos);
+            return getCorpRetangulo(forma->dados_especificos);
         case TIPO_LINHA:     
-            return getCorLinha(f->dados_especificos); // Linha não tem preenchimento, retornar a cor principal
+            return getCorLinha(forma->dados_especificos); // Linha não tem preenchimento, retornar a cor principal
         case TIPO_TEXTO:     
-            return getCorpTexto(f->dados_especificos);
+            return getCorpTexto(forma->dados_especificos);
     }
     return NULL;
 }
@@ -169,7 +181,29 @@ void* getFormaAssoc(const Forma f) {
         return NULL;
     }
     
-    return f->dados_especificos;
+    FormaInterno *forma = (FormaInterno*)f;
+    return forma->dados_especificos;
+}
+
+double getFormaArea(const Forma f) {
+    if (!f) {
+        return 0.0;  //erro
+    }
+
+    FormaInterno *forma = (FormaInterno*)f;
+
+    switch (forma->tipo) {
+        case TIPO_CIRCULO:
+            return calculaAreaCirculo(forma->dados_especificos);
+        case TIPO_RETANGULO:
+            return calculaAreaRetangulo(forma->dados_especificos);
+        case TIPO_LINHA:
+            return calculaAreaLinha(forma->dados_especificos);
+        case TIPO_TEXTO:
+            //texto não tem área (pode depender da fonte, mas assumindo 0)
+            return 0.0;
+    }
+    return 0.0;  //caso padrão para tipos inválidos
 }
 
 /*________________________________ FUNÇÕES DE MODIFICAÇÃO (SETTERS) ________________________________*/
@@ -179,33 +213,35 @@ void setFormaPosicao(Forma f, double x, double y) {
         return;
     }
 
-    switch (f->tipo) {
+    FormaInterno *forma = (FormaInterno*)f;
+
+    switch (forma->tipo) {
         case TIPO_CIRCULO:
-            setXCirculo(f->dados_especificos, x);
-            setYCirculo(f->dados_especificos, y);
+            setXCirculo(forma->dados_especificos, x);
+            setYCirculo(forma->dados_especificos, y);
             break;
         case TIPO_RETANGULO:
-            setXRetangulo(f->dados_especificos, x);
-            setYRetangulo(f->dados_especificos, y);
+            setXRetangulo(forma->dados_especificos, x);
+            setYRetangulo(forma->dados_especificos, y);
             break;
         case TIPO_TEXTO:
-            setXTexto(f->dados_especificos, x);
-            setYTexto(f->dados_especificos, y);
+            setXTexto(forma->dados_especificos, x);
+            setYTexto(forma->dados_especificos, y);
             break;
         case TIPO_LINHA: {
             // Mover uma linha significa transladar ambos os pontos
-            double x1_antigo = getX1Linha(f->dados_especificos);
-            double y1_antigo = getY1Linha(f->dados_especificos);
+            double x1_antigo = getX1Linha(forma->dados_especificos);
+            double y1_antigo = getY1Linha(forma->dados_especificos);
             double dx = x - x1_antigo;
             double dy = y - y1_antigo;
 
-            double x2_antigo = getX2Linha(f->dados_especificos);
-            double y2_antigo = getY2Linha(f->dados_especificos);
+            double x2_antigo = getX2Linha(forma->dados_especificos);
+            double y2_antigo = getY2Linha(forma->dados_especificos);
             
-            setX1Linha(f->dados_especificos, x);
-            setY1Linha(f->dados_especificos, y);
-            setX2Linha(f->dados_especificos, x2_antigo + dx);
-            setY2Linha(f->dados_especificos, y2_antigo + dy);
+            setX1Linha(forma->dados_especificos, x);
+            setY1Linha(forma->dados_especificos, y);
+            setX2Linha(forma->dados_especificos, x2_antigo + dx);
+            setY2Linha(forma->dados_especificos, y2_antigo + dy);
             break;
         }
     }
@@ -216,18 +252,20 @@ void setFormaCorBorda(Forma f, const char *corBorda) {
         return;
     }
 
-    switch (f->tipo) {
+    FormaInterno *forma = (FormaInterno*)f;
+
+    switch (forma->tipo) {
         case TIPO_CIRCULO:  
-            setCorbCirculo(f->dados_especificos, corBorda); 
+            setCorbCirculo(forma->dados_especificos, corBorda); 
             break;
         case TIPO_RETANGULO: 
-            setCorbRetangulo(f->dados_especificos, corBorda); 
+            setCorbRetangulo(forma->dados_especificos, corBorda); 
             break;
         case TIPO_LINHA:     
-            setCorLinha(f->dados_especificos, corBorda); 
+            setCorLinha(forma->dados_especificos, corBorda); 
             break;
         case TIPO_TEXTO:     
-            setCorbTexto(f->dados_especificos, corBorda); 
+            setCorbTexto(forma->dados_especificos, corBorda); 
             break;
     }
 }
@@ -237,18 +275,20 @@ void setFormaCorPreenchimento(Forma f, const char *corPreenchimento) {
         return;
     }
 
-    switch (f->tipo) {
+    FormaInterno *forma = (FormaInterno*)f;
+
+    switch (forma->tipo) {
         case TIPO_CIRCULO:   
-            setCorpCirculo(f->dados_especificos, corPreenchimento);
+            setCorpCirculo(forma->dados_especificos, corPreenchimento);
             break;
         case TIPO_RETANGULO: 
-            setCorpRetangulo(f->dados_especificos, corPreenchimento); 
+            setCorpRetangulo(forma->dados_especificos, corPreenchimento); 
             break;
         case TIPO_LINHA:     
-            setCorLinha(f->dados_especificos, corPreenchimento); 
+            setCorLinha(forma->dados_especificos, corPreenchimento); 
             break;
         case TIPO_TEXTO:     
-            setCorpTexto(f->dados_especificos, corPreenchimento); 
+            setCorpTexto(forma->dados_especificos, corPreenchimento); 
             break;
     }
 }
@@ -261,19 +301,21 @@ void desenhaForma(const Forma f, FILE *arquivoSvg) {
         return;
     }
 
+    FormaInterno *forma = (FormaInterno*)f;
+
     // Delega a chamada para a função de impressão SVG específica de cada tipo
-    switch (f->tipo) {
+    switch (forma->tipo) {
         case TIPO_CIRCULO:   
-            imprimeCirculoSVG(f->dados_especificos, arquivoSvg); 
+            imprimeCirculoSVG(forma->dados_especificos, arquivoSvg); 
             break;
         case TIPO_RETANGULO: 
-            imprimeRetanguloSVG(f->dados_especificos, arquivoSvg); 
+            imprimeRetanguloSVG(forma->dados_especificos, arquivoSvg); 
             break;
         case TIPO_LINHA:     
-            imprimeLinhaSVG(f->dados_especificos, arquivoSvg); 
+            imprimeLinhaSVG(forma->dados_especificos, arquivoSvg); 
             break;
         case TIPO_TEXTO:     
-            imprimeTextoSVG(f->dados_especificos, arquivoSvg); 
+            imprimeTextoSVG(forma->dados_especificos, arquivoSvg); 
             break;
     }
 }

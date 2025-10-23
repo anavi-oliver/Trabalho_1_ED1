@@ -19,7 +19,7 @@
  * que entra é o primeiro que sai) - estrutura de PILHA.
  */
 
-typedef struct Carregador_t *Carregador;
+typedef void *Carregador;
 
 
 /*________________________________ FUNÇÕES DE CRIAÇÃO E DESTRUIÇÃO ________________________________*/

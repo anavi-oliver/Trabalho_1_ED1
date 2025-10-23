@@ -1,3 +1,4 @@
+
 #include "processaQry.h"
 
 #include "fila.h"
@@ -137,7 +138,7 @@ for (int i = 0; i < repo_interno->num_carregadores; i++) {
     free(repo_interno);
 }
 
-void processaQry(const char *nome_path_qry, const char *nome_txt, Arena arena, Chao chao, double *pontuacao_total) {
+void processaQry(const char *nome_path_qry, const char *nome_txt,  Arena arena, Chao chao, double *pontuacao_total, int *formas_clonadas_out, int *formas_esmagadas_out) {
     (void)arena;
 
     FILE *arquivo_qry = fopen(nome_path_qry, "r");
@@ -377,41 +378,38 @@ else if (strcmp(comando, "atch") == 0) {
                 instrucoes_realizadas++;
             }
         }
+    
         
-        //calc: Calcular colisões e processar arena
-        else if (strcmp(comando, "calc") == 0) {
-            fprintf(arquivo_txt, "    Processando colisões na arena...\n");
-            
-            //processa a arena e atualiza estatísticas
-            //processaArena(arena, chao, pontuacao_total, &formas_clonadas, &formas_esmagadas);
-            
-            fprintf(arquivo_txt, "    Resultado do processamento:\n");
-            fprintf(arquivo_txt, "      Formas esmagadas neste round: %d\n", 0); // formas_esmagadas
-            fprintf(arquivo_txt, "      Formas clonadas neste round: %d\n", 0); // formas_clonadas
-            fprintf(arquivo_txt, "      Pontuação acumulada: %.2f\n", *pontuacao_total);
-            
-            instrucoes_realizadas++;
-        }
-        
-        else {
-            fprintf(arquivo_txt, "    [AVISO] Comando desconhecido\n");
-        }
-        
-        fprintf(arquivo_txt, "\n");
+// calc: Calcular colisões e processar arena
+else if (strcmp(comando, "calc") == 0) {
+    instrucoes_realizadas++;
+
+    processaInteracoesArena(arena, chao, pontuacao_total, NULL, arquivo_txt, 
+                           &formas_clonadas, &formas_esmagadas, repo);
+    
+    // ✅ REMOVEMOS destroiRepositorio e fclose daqui
+    // Eles serão chamados apenas no final da função
+}
     }
 
-    // ==============================================================//
-    //                       RELATÓRIO FINAL                            
 
-    fprintf(arquivo_txt, "\n===== RELATÓRIO FINAL =====\n");
-    fprintf(arquivo_txt, "Pontuação total: %.2f\n", *pontuacao_total);
-    fprintf(arquivo_txt, "Número de instruções realizadas: %d\n", instrucoes_realizadas);
-    fprintf(arquivo_txt, "Número total de disparos: %d\n", total_disparos);
-    fprintf(arquivo_txt, "Número de formas esmagadas: %d\n", formas_esmagadas);
-    fprintf(arquivo_txt, "Número de formas clonadas: %d\n", formas_clonadas);
-    fprintf(arquivo_txt, "===============================\n");
-    
-    destroiRepositorio(repo);
-    fclose(arquivo_qry);
-    fclose(arquivo_txt);
+    // ==============================================================//
+    //                       RELATÓRIO FINAL                        
+
+fprintf(arquivo_txt, "\n===== RELATÓRIO FINAL =====\n");
+fprintf(arquivo_txt, "Pontuação total: %.2f\n", *pontuacao_total);
+fprintf(arquivo_txt, "Número de instruções realizadas: %d\n", instrucoes_realizadas);
+fprintf(arquivo_txt, "Número total de disparos: %d\n", total_disparos);
+fprintf(arquivo_txt, "Número de formas esmagadas: %d\n", formas_esmagadas);
+fprintf(arquivo_txt, "Número de formas clonadas: %d\n", formas_clonadas);
+fprintf(arquivo_txt, "===============================\n");
+
+// Atualiza valores de saída
+if (formas_clonadas_out != NULL) *formas_clonadas_out = formas_clonadas;
+if (formas_esmagadas_out != NULL) *formas_esmagadas_out = formas_esmagadas;
+
+destroiRepositorio(repo);
+fclose(arquivo_qry);
+fclose(arquivo_txt);
+
 }

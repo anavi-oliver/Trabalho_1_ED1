@@ -1,3 +1,4 @@
+
 #include "sobreposicao.h"
 
 #include "formas.h"
@@ -25,76 +26,6 @@ static bool pontoDentroRetangulo(Retangulo r, double px, double py) {
     
     return (px >= x && px <= x + w && py >= y && py <= y + h);
 }
-
-bool formasSobrepoem(Forma f1, Forma f2) {
-    if (f1 == NULL || f2 == NULL) return false;
-    
-    TipoForma tipo1 = getFormaTipo(f1);
-    TipoForma tipo2 = getFormaTipo(f2);
-    
-    switch (tipo1) {
-
-        case TIPO_CIRCULO:
-            switch (tipo2) {
-
-                case TIPO_CIRCULO:
-                    return sobreposicaoCirculoCirculo((Circulo)f1, (Circulo)f2);
-
-                case TIPO_RETANGULO:
-                    return sobreposicaoCirculoRetangulo((Circulo)f1, (Retangulo)f2);
-
-                case TIPO_LINHA:
-                    return sobreposicaoCirculoLinha((Circulo)f1, (Linha)f2);
-
-                case TIPO_TEXTO:
-                    return sobreposicaoCirculoTexto((Circulo)f1, (Texto)f2);
-
-            } break;
-            
-        case TIPO_RETANGULO:
-            switch (tipo2) {
-                
-                case TIPO_CIRCULO:
-                    return sobreposicaoCirculoRetangulo((Circulo)f2, (Retangulo)f1);
-
-                case TIPO_RETANGULO:
-                    return sobreposicaoRetanguloRetangulo((Retangulo)f1, (Retangulo)f2);
-
-                case TIPO_LINHA:
-                    return sobreposicaoRetanguloLinha((Retangulo)f1, (Linha)f2);
-
-                case TIPO_TEXTO:
-                    return sobreposicaoRetanguloTexto((Retangulo)f1, (Texto)f2);
-
-            } break;
-            
-        case TIPO_LINHA:
-            switch (tipo2) {
-                case TIPO_CIRCULO:
-                    return sobreposicaoCirculoLinha((Circulo)f2, (Linha)f1);
-                case TIPO_RETANGULO:
-                    return sobreposicaoRetanguloLinha((Retangulo)f2, (Linha)f1);
-                case TIPO_LINHA:
-                    return sobreposicaoLinhaLinha((Linha)f1, (Linha)f2);
-                case TIPO_TEXTO:
-                    return sobreposicaoLinhaTexto((Linha)f1, (Texto)f2);
-            } break;
-            
-        case TIPO_TEXTO:
-            switch (tipo2) {
-                case TIPO_CIRCULO:
-                    return sobreposicaoCirculoTexto((Circulo)f2, (Texto)f1);
-                case TIPO_RETANGULO:
-                    return sobreposicaoRetanguloTexto((Retangulo)f2, (Texto)f1);
-                case TIPO_LINHA:
-                    return sobreposicaoLinhaTexto((Linha)f2, (Texto)f1);
-                case TIPO_TEXTO:
-                    return sobreposicaoTextoTexto((Texto)f1, (Texto)f2);
-            } break;
-    }
-    
-    return false;
-} //formasSobrepoem
 
 bool sobreposicaoCirculoCirculo(Circulo c1, Circulo c2) {
     double x1 = getXCirculo(c1);

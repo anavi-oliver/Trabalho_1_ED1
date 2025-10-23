@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-
 struct Carregador_t {
     int id;
     Stack pilhaDeFormas; // carregador = pilha de formas
@@ -11,9 +10,8 @@ struct Carregador_t {
 
 /*________________________________ FUNÇÕES DE CRIAÇÃO E DESTRUIÇÃO ________________________________*/
 
-Carregador criaCarregador(int id){
-
-    Carregador c = malloc(sizeof(struct Carregador_t));
+Carregador criaCarregador(int id) {
+    struct Carregador_t *c = malloc(sizeof(struct Carregador_t));
     if (c == NULL) {
         printf("ERRO: Falha ao alocar memoria para o Carregador.\n");
         return NULL;
@@ -30,25 +28,26 @@ Carregador criaCarregador(int id){
     
     printf("Carregador %d criado com sucesso!\n", id);
     
-    return c;
+    return (Carregador)c;
 }
 
-void destroiCarregador(Carregador c){
+void destroiCarregador(Carregador c) {
     if (c == NULL) {
         return;
     }
 
-    // Libera a pilha (mas não as formas)
-    destroiPilha(c->pilhaDeFormas);
+    struct Carregador_t *carr = (struct Carregador_t *)c;
 
-    free(c);
+    // Libera a pilha (mas não as formas)
+    destroiPilha(carr->pilhaDeFormas);
+
+    free(carr);
 }
 
 
 /*________________________________ FUNÇÕES DE MANIPULAÇÃO ________________________________*/
 
-void carregaFormasDoChao(Carregador carregadorAlvo, Chao chaoOrigem, int n){
-
+void carregaFormasDoChao(Carregador carregadorAlvo, Chao chaoOrigem, int n) {
     if (carregadorAlvo == NULL || chaoOrigem == NULL) {
         printf("AVISO: Carregador ou Chao nulo passado para carregaFormasDoChao.\n");
         return;
@@ -57,6 +56,8 @@ void carregaFormasDoChao(Carregador carregadorAlvo, Chao chaoOrigem, int n){
     if (n <= 0) {
         return; //faz nada
     }
+
+    struct Carregador_t *carr = (struct Carregador_t *)carregadorAlvo;
 
     //loop para transferir 'n' formas
     for (int i = 0; i < n; i++) {
@@ -71,10 +72,10 @@ void carregaFormasDoChao(Carregador carregadorAlvo, Chao chaoOrigem, int n){
 
         //insere a forma removida no carregador (empilha)
         if (formaMovida != NULL) {
-            empilha(carregadorAlvo->pilhaDeFormas, formaMovida);
+            empilha(carr->pilhaDeFormas, formaMovida);
         }
     }//loop pra transferir n
-} //carregaFormas
+}
 
 Queue carregaFormasDoChaoComRastreio(Carregador carregadorAlvo, Chao chaoOrigem, int n) {
     //cria fila para rastrear formas carregadas
@@ -94,6 +95,8 @@ Queue carregaFormasDoChaoComRastreio(Carregador carregadorAlvo, Chao chaoOrigem,
         return filaRastreio; 
     }
 
+    struct Carregador_t *carr = (struct Carregador_t *)carregadorAlvo;
+
     for (int i = 0; i < n; i++) {
         //verifica se o chão ainda tem formas
         if (chaoEstaVazio(chaoOrigem)) {
@@ -104,7 +107,7 @@ Queue carregaFormasDoChaoComRastreio(Carregador carregadorAlvo, Chao chaoOrigem,
         Forma formaMovida = removeFormaChao(chaoOrigem);
 
         if (formaMovida != NULL) {
-            empilha(carregadorAlvo->pilhaDeFormas, formaMovida);
+            empilha(carr->pilhaDeFormas, formaMovida);
             enfileira(filaRastreio, formaMovida); // registra na fila
         }
     }
@@ -113,17 +116,26 @@ Queue carregaFormasDoChaoComRastreio(Carregador carregadorAlvo, Chao chaoOrigem,
 }
 
 Forma descarregaForma(Carregador c) {
-    if (carregadorEstaVazio(c)) {
+    if (c == NULL) {
         return NULL;
     }
-    return desempilha(c->pilhaDeFormas);
+
+    struct Carregador_t *carr = (struct Carregador_t *)c;
+
+    if (estaVaziaPilha(carr->pilhaDeFormas)) {
+        return NULL;
+    }
+
+    return desempilha(carr->pilhaDeFormas);
 }
 
 void insereFormaCarregador(Carregador c, Forma f) {
     if (c == NULL || f == NULL) {
         return;
     }
-    empilha(c->pilhaDeFormas, f);
+
+    struct Carregador_t *carr = (struct Carregador_t *)c;
+    empilha(carr->pilhaDeFormas, f);
 }
 
 
@@ -133,19 +145,25 @@ int getCarregadorId(const Carregador c) {
     if (c == NULL) {
         return -1; //retorna um ID inválido em caso de erro
     }
-    return c->id;
+
+    struct Carregador_t *carr = (struct Carregador_t *)c;
+    return carr->id;
 }
 
 int getCarregadorTamanho(const Carregador c) {
     if (c == NULL) {
         return 0;
     }
-    return getTamanhoPilha(c->pilhaDeFormas);
+
+    struct Carregador_t *carr = (struct Carregador_t *)c;
+    return getTamanhoPilha(carr->pilhaDeFormas);
 }
 
 bool carregadorEstaVazio(const Carregador c) {
     if (c == NULL) {
         return true; 
     }
-    return estaVaziaPilha(c->pilhaDeFormas);
+
+    struct Carregador_t *carr = (struct Carregador_t *)c;
+    return estaVaziaPilha(carr->pilhaDeFormas);
 }
