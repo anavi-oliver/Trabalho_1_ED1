@@ -110,13 +110,27 @@ static Forma clonarFormaInvertida(Forma f1) {
     if (f1 == NULL) return NULL;
 
     TipoForma tipo = getFormaTipo(f1);
-    char *corB = getFormaCorBorda(f1);
-    char *corP = getFormaCorPreenchimento(f1);
+    
+    // ✅ CÓPIA SEGURA DAS CORES
+    char corBorda_original[64];
+    char corPreench_original[64];
+    
+    strncpy(corBorda_original, getFormaCorBorda(f1), 63);
+    corBorda_original[63] = '\0';
+    
+    strncpy(corPreench_original, getFormaCorPreenchimento(f1), 63);
+    corPreench_original[63] = '\0';
+    
+    printf("DEBUG CLONE - Cores originais: borda='%s', preench='%s'\n", 
+           corBorda_original, corPreench_original);
 
-    // Inverter as cores
-    char novaCorB[64], novaCorP[64];
-    strcpy(novaCorB, corP);
-    strcpy(novaCorP, corB);
+    // Inverter as cores: borda ↔ preenchimento
+    char novaCorBorda[64], novaCorPreench[64];
+    strcpy(novaCorBorda, corPreench_original);    // nova borda = antigo preenchimento
+    strcpy(novaCorPreench, corBorda_original);     // novo preenchimento = antiga borda
+    
+    printf("DEBUG CLONE - Cores invertidas: borda='%s', preench='%s'\n", 
+           novaCorBorda, novaCorPreench);
 
     int novoId = getFormaId(f1) + 100000; // Novo ID seguro
     void *dados = NULL;
@@ -127,7 +141,7 @@ static Forma clonarFormaInvertida(Forma f1) {
             double x = getXCirculo(c);
             double y = getYCirculo(c);
             double r = getRCirculo(c);
-            dados = criarCirculo(novoId, x, y, r, novaCorB, novaCorP, false, 0);
+            dados = criarCirculo(novoId, x, y, r, novaCorBorda, novaCorPreench, false, 0);
             break;
         }
 
@@ -137,7 +151,7 @@ static Forma clonarFormaInvertida(Forma f1) {
             double y = getYRetangulo(r);
             double w = getLarguraRetangulo(r);
             double h = getAlturaRetangulo(r);
-            dados = criarRetangulo(novoId, x, y, w, h, novaCorB, novaCorP, false, 0);
+            dados = criarRetangulo(novoId, x, y, w, h, novaCorBorda, novaCorPreench, false, 0);
             break;
         }
 
@@ -147,7 +161,7 @@ static Forma clonarFormaInvertida(Forma f1) {
             double y1 = getY1Linha(l);
             double x2 = getX2Linha(l);
             double y2 = getY2Linha(l);
-            dados = criarLinha(novoId, x1, y1, x2, y2, novaCorB, false, 0);
+            dados = criarLinha(novoId, x1, y1, x2, y2, novaCorBorda, false, 0);
             break;
         }
 
@@ -158,7 +172,7 @@ static Forma clonarFormaInvertida(Forma f1) {
             char ancora = getAncora(t);
             char *conteudo = getTexto(t);
             Estilo est = getEstiloTexto(t);
-            dados = criarTexto(novoId, x, y, novaCorB, novaCorP, ancora, conteudo, est);
+            dados = criarTexto(novoId, x, y, novaCorBorda, novaCorPreench, ancora, conteudo, est);
             break;
         }
 
@@ -172,6 +186,7 @@ static Forma clonarFormaInvertida(Forma f1) {
 
     return NULL;
 }
+
 
 
 /*________________________________ VERIFICAÇÃO DE SOBREPOSIÇÃO ________________________________*/
@@ -202,7 +217,7 @@ static bool formasSobrepoem(Forma f1, Forma f2) {
         double distQuadrada = dx * dx + dy * dy;
         double somaRaios = r1 + r2;
         
-        return distQuadrada < (somaRaios * somaRaios);
+        return distQuadrada <= (somaRaios * somaRaios);
     }
 
     // CASO 2: Retângulo vs Retângulo
@@ -223,9 +238,6 @@ static bool formasSobrepoem(Forma f1, Forma f2) {
         // Teste AABB correto
         bool overlapX = (x1 < x2 + w2) && (x1 + w1 > x2);
         bool overlapY = (y1 < y2 + h2) && (y1 + h1 > y2);
-        
-        printf("DEBUG AABB: Ret1[%.0f,%.0f  +%.0f,%.0f] vs Ret2[%.0f,%.0f +%.0f,%.0f] → X:%d Y:%d\n",
-               x1, y1, w1, h1, x2, y2, w2, h2, overlapX, overlapY);
         
         return overlapX && overlapY;
     }
@@ -267,11 +279,11 @@ static bool formasSobrepoem(Forma f1, Forma f2) {
         double dy = cy - closestY;
         double distQuadrada = dx * dx + dy * dy;
         
-        return distQuadrada < (raio * raio);
+        return distQuadrada <= (raio * raio);
     }
 
-    // CASOS COM LINHA/TEXTO: Usa bounding box
-    return false; // Por simplicidade, ignora linha/texto por enquanto
+    // CASOS COM LINHA/TEXTO: Por simplicidade, retorna false
+    return false;
 }
 
 
@@ -309,7 +321,7 @@ void processaInteracoesArena(Arena a, Chao chao, double *pontuacao_total, Queue 
             break;
         }
 
-        printf("\n--- Comparando formas ---\n");
+ printf("\n--- Comparando formas ---\n");
         printf("Forma I: ID=%d, Pos=(%.2f, %.2f), Área=%.2f\n", 
                getFormaId(forma_I), getFormaX(forma_I), getFormaY(forma_I), getFormaArea(forma_I));
         printf("Forma J: ID=%d, Pos=(%.2f, %.2f), Área=%.2f\n", 
@@ -349,45 +361,51 @@ void processaInteracoesArena(Arena a, Chao chao, double *pontuacao_total, Queue 
                 destroiForma(forma_I);
                 adicionaFormaChao(chao, forma_J);
             }
-            // ========== REGRA 2: área(I) >= área(J) ==========
-            else {
-                printf(">>> REGRA 2: I >= J <<<\n");
-                printf("Forma ID=%d (área=%.2f) modifica ID=%d (área=%.2f)\n",
-                       getFormaId(forma_I), area_I, getFormaId(forma_J), area_J);
+         
+// ========== REGRA 2: área(I) >= área(J) ==========
+else {
+    printf(">>> REGRA 2: I >= J <<<\n");
+    printf("Forma ID=%d (área=%.2f) modifica ID=%d (área=%.2f)\n",
+           getFormaId(forma_I), area_I, getFormaId(forma_J), area_J);
 
-                if (arquivo_txt) {
-                    fprintf(arquivo_txt, "<<<-- I >= J -->>> Forma %d (área %.2f) modifica forma %d (área %.2f).\n",
-                            getFormaId(forma_I), area_I, getFormaId(forma_J), area_J);
-                }
+    if (arquivo_txt) {
+        fprintf(arquivo_txt, "<<<-- I >= J -->>> Forma %d (área %.2f) modifica forma %d (área %.2f).\n",
+                getFormaId(forma_I), area_I, getFormaId(forma_J), area_J);
+    }
 
-                // Salva cores originais de I
-                char *corBordaI = getFormaCorBorda(forma_I);
-                char *corPreenchI = getFormaCorPreenchimento(forma_I);
+    // APENAS MUDA A COR DE BORDA DE J
+    char corPreenchI[64];
+    strncpy(corPreenchI, getFormaCorPreenchimento(forma_I), 63);
+    corPreenchI[63] = '\0';
+    
+    printf("DEBUG - Mudando borda de J para: '%s'\n", corPreenchI);
+    printf("DEBUG - J ANTES: borda='%s', preench='%s'\n",
+           getFormaCorBorda(forma_J), getFormaCorPreenchimento(forma_J));
+    
+    // SÓ muda a borda de J 
+    setFormaCorBorda(forma_J, corPreenchI);
+    
+    printf("DEBUG - J DEPOIS: borda='%s', preench='%s'\n",
+           getFormaCorBorda(forma_J), getFormaCorPreenchimento(forma_J));
 
-                // TROCA AS CORES DE J:
-                // Cor borda de J = cor preenchimento de I
-                // Cor preenchimento de J = cor borda de I
-                setFormaCorBorda(forma_J, corPreenchI);
-                setFormaCorPreenchimento(forma_J, corBordaI);
+    // Clona I com cores invertidas
+    Forma clone_I = clonarFormaInvertida(forma_I);
+    
+    if (clone_I != NULL && formas_clonadas != NULL) {
+        (*formas_clonadas)++;
+        printf("✓ Clone criado: ID=%d, borda='%s', preench='%s'\n", 
+               getFormaId(clone_I),
+               getFormaCorBorda(clone_I),
+               getFormaCorPreenchimento(clone_I));
+    }
 
-                printf("Cores modificadas em J: borda='%s', preench='%s'\n",
-                       getFormaCorBorda(forma_J), getFormaCorPreenchimento(forma_J));
-
-                // Clona I com cores invertidas
-                Forma clone_I = clonarFormaInvertida(forma_I);
-                
-                if (clone_I != NULL && formas_clonadas != NULL) {
-                    (*formas_clonadas)++;
-                    printf("✓ Clone criado: ID=%d\n", getFormaId(clone_I));
-                }
-
-                // ========== ORDEM CRÍTICA: J → I → Clone_I ==========
-                adicionaFormaChao(chao, forma_J);   // 1º: J
-                adicionaFormaChao(chao, forma_I);   // 2º: I
-                if (clone_I != NULL) {
-                    adicionaFormaChao(chao, clone_I); // 3º: Clone
-                }
-            }
+    // ========== ORDEM CRÍTICA: J → I → Clone_I ==========
+    adicionaFormaChao(chao, forma_J);   // 1º: J (com borda modificada, preench original)
+    adicionaFormaChao(chao, forma_I);   // 2º: I (cores originais)
+    if (clone_I != NULL) {
+        adicionaFormaChao(chao, clone_I); // 3º: Clone (cores invertidas)
+    }
+}
         }
         else {
             // ========== SEM SOBREPOSIÇÃO ==========
@@ -428,7 +446,6 @@ void processaInteracoesArena(Arena a, Chao chao, double *pontuacao_total, Queue 
         fprintf(arquivo_txt, "Formas clonadas: %d\n\n", formas_clonadas ? *formas_clonadas : 0);
     }
 }
-
 
 /*________________________________ FUNÇÕES DE CONSULTA E MODIFICAÇÃO ________________________________*/
 
