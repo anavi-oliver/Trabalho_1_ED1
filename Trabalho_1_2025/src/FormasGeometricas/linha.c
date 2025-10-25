@@ -4,17 +4,17 @@
 #include <string.h>
 #include <math.h>
 
-// estrutura interna da linha
 typedef struct linha {
-    int id;           // identificador 
-    double x1;        // coordenada X do ponto inicial
-    double y1;        // coordenada Y do ponto inicial
-    double x2;        // coordenada X do ponto final
-    double y2;        // coordenada Y do ponto final
-    char *cor;        // cor da linha
-    double sw;        // largura do traço
-    bool disp;        // flag de disparo
-    int n;            // identificador de seleção
+    int id;
+    double x1;
+    double y1;
+    double x2;
+    double y2;
+    char *cor;
+    double sw;
+    bool disp;
+    int n;
+    bool pontilhada;
 } linhaC;
 
 /*                                FUNÇÕES DE CRIAÇÃO E DESTRUIÇÃO                                */ 
@@ -43,6 +43,7 @@ Linha criarLinha(int i, double x1, double y1, double x2, double y2, char *cor, b
     l->sw = 1.0;     
     l->disp = disp;
     l->n = n;
+    l->pontilhada = false;
     
     return (Linha) l;
 }
@@ -149,6 +150,12 @@ void setNLinha(Linha l, int n) {
     linha->n = n;
 }
 
+void setPontilhadaLinha(Linha l, bool pontilhada) {
+    if (l == NULL) return;
+    linhaC *linha = (linhaC*) l;
+    linha->pontilhada = pontilhada;
+}
+
 /*                                FUNÇÕES GEOMÉTRICAS                                */
 
 double calculaComprimentoLinha(Linha l) {
@@ -171,12 +178,14 @@ void imprimeLinhaSVG(Linha l, FILE *arquivo) {
 
     linhaC *linha = (linhaC*) l;
 
-    //imprime a tag <line> no arquivo SVG com os atributos da struct
-    fprintf(arquivo, "\t<line x1=\"%.2f\" y1=\"%.2f\" x2=\"%.2f\" y2=\"%.2f\" stroke=\"%s\" stroke-width=\"%.2f\" />\n",
-            linha->x1,
-            linha->y1,
-            linha->x2,
-            linha->y2,
-            linha->cor,
-            linha->sw);
+    //imprime a tag <line> no arquivo SVG
+    fprintf(arquivo, "\t<line x1=\"%.2f\" y1=\"%.2f\" x2=\"%.2f\" y2=\"%.2f\" stroke=\"%s\" stroke-width=\"%.2f\"",
+            linha->x1, linha->y1, linha->x2, linha->y2, linha->cor, linha->sw);
+    
+    //adiciona pontilhado se precisar
+    if (linha->pontilhada) {
+        fprintf(arquivo, " stroke-dasharray=\"5,5\"");
+    }
+    
+    fprintf(arquivo, " />\n");
 }

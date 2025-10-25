@@ -188,6 +188,16 @@ em lote de elementos relacionados.
 */
 void setNLinha(Linha l, int n);
 
+
+/*
+Define se a linha deve ser pontilhada.
+
+* pontilhada: true para linha pontilhada, false para linha sólida
+*
+* Pós-condição: o estilo da linha é atualizado
+*/
+void setPontilhadaLinha(Linha l, bool pontilhada);
+
 /*               FUNÇÕES GEOMÉTRICAS */
 
 /*

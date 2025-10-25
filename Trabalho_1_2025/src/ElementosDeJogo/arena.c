@@ -1,4 +1,3 @@
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -16,7 +15,6 @@ struct Arena_t {
     double altura;
     Queue filaDeFormas; 
 };
-
 
 /*________________________________ FUNÇÕES DE CRIAÇÃO E DESTRUIÇÃO ________________________________*/
 
@@ -47,7 +45,6 @@ void destroiArena(Arena a) {
 
     struct Arena_t *arena = (struct Arena_t*) a;
 
-    // Arena é "dona" das formas - destruir cada forma antes de destruir a fila
     while (!estaVaziaFila(arena->filaDeFormas)) {
         Forma f = desenfileira(arena->filaDeFormas);
         destroiForma(f);
@@ -56,7 +53,6 @@ void destroiArena(Arena a) {
     destroiFila(arena->filaDeFormas);
     free(arena);
 }
-
 
 /*________________________________ FUNÇÕES DE MANIPULAÇÃO DE FORMAS ________________________________*/
 
@@ -94,15 +90,12 @@ void iteraFormasArena(const Arena a, void (*executa)(Forma f, void *auxData), vo
         return;
     }
 
-    // Loop processa cada elemento da fila uma vez
-    // Retira um elemento do início, executa a função e coloca de volta no fim
     for (int i = 0; i < tamanhoOriginal; i++) {
         Forma f = desenfileira(arena->filaDeFormas);
         executa(f, auxData);
         enfileira(arena->filaDeFormas, f);
     }
 }
-
 
 /*________________________________ FUNÇÃO DE CLONAGEM COM CORES INVERTIDAS ________________________________*/
 
@@ -111,7 +104,6 @@ static Forma clonarFormaInvertida(Forma f1) {
 
     TipoForma tipo = getFormaTipo(f1);
     
-    // ✅ CÓPIA SEGURA DAS CORES
     char corBorda_original[64];
     char corPreench_original[64];
     
@@ -120,19 +112,12 @@ static Forma clonarFormaInvertida(Forma f1) {
     
     strncpy(corPreench_original, getFormaCorPreenchimento(f1), 63);
     corPreench_original[63] = '\0';
-    
-    printf("DEBUG CLONE - Cores originais: borda='%s', preench='%s'\n", 
-           corBorda_original, corPreench_original);
 
-    // Inverter as cores: borda ↔ preenchimento
     char novaCorBorda[64], novaCorPreench[64];
-    strcpy(novaCorBorda, corPreench_original);    // nova borda = antigo preenchimento
-    strcpy(novaCorPreench, corBorda_original);     // novo preenchimento = antiga borda
-    
-    printf("DEBUG CLONE - Cores invertidas: borda='%s', preench='%s'\n", 
-           novaCorBorda, novaCorPreench);
+    strcpy(novaCorBorda, corPreench_original);
+    strcpy(novaCorPreench, corBorda_original);
 
-    int novoId = getFormaId(f1) + 100000; // Novo ID seguro
+    int novoId = getFormaId(f1) + 100000;
     void *dados = NULL;
 
     switch (tipo) {
@@ -187,8 +172,6 @@ static Forma clonarFormaInvertida(Forma f1) {
     return NULL;
 }
 
-
-
 /*________________________________ VERIFICAÇÃO DE SOBREPOSIÇÃO ________________________________*/
 
 static bool formasSobrepoem(Forma f1, Forma f2) {
@@ -199,7 +182,7 @@ static bool formasSobrepoem(Forma f1, Forma f2) {
     TipoForma tipo1 = getFormaTipo(f1);
     TipoForma tipo2 = getFormaTipo(f2);
 
-    // CASO 1: Círculo vs Círculo
+    //CASO 1: Círculo vs Círculo
     if (tipo1 == TIPO_CIRCULO && tipo2 == TIPO_CIRCULO) {
         Circulo c1 = getFormaAssoc(f1);
         Circulo c2 = getFormaAssoc(f2);
@@ -220,7 +203,7 @@ static bool formasSobrepoem(Forma f1, Forma f2) {
         return distQuadrada <= (somaRaios * somaRaios);
     }
 
-    // CASO 2: Retângulo vs Retângulo
+    //CASO 2: Retângulo vs Retângulo
     if (tipo1 == TIPO_RETANGULO && tipo2 == TIPO_RETANGULO) {
         Retangulo r1 = getFormaAssoc(f1);
         Retangulo r2 = getFormaAssoc(f2);
@@ -235,14 +218,13 @@ static bool formasSobrepoem(Forma f1, Forma f2) {
         double w2 = getLarguraRetangulo(r2);
         double h2 = getAlturaRetangulo(r2);
         
-        // Teste AABB correto
         bool overlapX = (x1 < x2 + w2) && (x1 + w1 > x2);
         bool overlapY = (y1 < y2 + h2) && (y1 + h1 > y2);
         
         return overlapX && overlapY;
     }
 
-    // CASO 3: Círculo vs Retângulo
+    //CASO 3: Círculo vs Retângulo
     if ((tipo1 == TIPO_CIRCULO && tipo2 == TIPO_RETANGULO) ||
         (tipo1 == TIPO_RETANGULO && tipo2 == TIPO_CIRCULO)) {
         
@@ -282,10 +264,8 @@ static bool formasSobrepoem(Forma f1, Forma f2) {
         return distQuadrada <= (raio * raio);
     }
 
-    // CASOS COM LINHA/TEXTO: Por simplicidade, retorna false
     return false;
 }
-
 
 /*________________________________ PROCESSAMENTO DE INTERAÇÕES ________________________________*/
 
@@ -297,7 +277,6 @@ void processaInteracoesArena(Arena a, Chao chao, double *pontuacao_total, Queue 
     }
 
     struct Arena_t *arena = (struct Arena_t*) a;
-    (void)anotacoes_svg;
     (void)repo;
 
     double area_esmagada_round = 0.0;
@@ -311,9 +290,8 @@ void processaInteracoesArena(Arena a, Chao chao, double *pontuacao_total, Queue 
         fprintf(arquivo_txt, "Total de formas: %d\n\n", total_formas_inicial);
     }
 
-    // ========== LOOP PRINCIPAL: Processa pares adjacentes (I, J) ==========
+    //loop principal: processa pares adjacentes (I, J)
     while (getTamanhoFila(arena->filaDeFormas) >= 2) {
-        // Remove os dois primeiros elementos da fila (I e J)
         Forma forma_I = desenfileira(arena->filaDeFormas);
         Forma forma_J = desenfileira(arena->filaDeFormas);
 
@@ -321,7 +299,7 @@ void processaInteracoesArena(Arena a, Chao chao, double *pontuacao_total, Queue 
             break;
         }
 
- printf("\n--- Comparando formas ---\n");
+        printf("\n--- Comparando formas ---\n");
         printf("Forma I: ID=%d, Pos=(%.2f, %.2f), Área=%.2f\n", 
                getFormaId(forma_I), getFormaX(forma_I), getFormaY(forma_I), getFormaArea(forma_I));
         printf("Forma J: ID=%d, Pos=(%.2f, %.2f), Área=%.2f\n", 
@@ -340,7 +318,7 @@ void processaInteracoesArena(Arena a, Chao chao, double *pontuacao_total, Queue 
                         getFormaId(forma_I), getFormaId(forma_J));
             }
 
-            // ========== REGRA 1: área(I) < área(J) ==========
+            //========== REGRA 1: área(I) < área(J) ==========
             if (area_I < area_J) {
                 printf(">>> REGRA 1: I < J <<<\n");
                 printf("* Forma ID=%d (área=%.2f) ESMAGADA por ID=%d (área=%.2f)\n",
@@ -351,77 +329,80 @@ void processaInteracoesArena(Arena a, Chao chao, double *pontuacao_total, Queue 
                             getFormaId(forma_I), area_I, getFormaId(forma_J), area_J);
                 }
 
-                // Acumula área esmagada e incrementa contador
+                //CRIAR ASTERISCO VERMELHO na posição da forma esmagada
+                if (anotacoes_svg != NULL) {
+                    double x_esmagada = getFormaX(forma_I);
+                    double y_esmagada = getFormaY(forma_I);
+                    
+                    Estilo estilo_asterisco = criarEstilo("sans-serif", "bold", "30px");
+                    Texto asterisco = criarTexto(-5000 - getFormaId(forma_I), 
+                                                 x_esmagada, y_esmagada, 
+                                                 "red", "red", 'm', "*", estilo_asterisco);
+                    destroiEstilo(estilo_asterisco);
+                    
+                    Forma forma_asterisco = criaForma(-5000 - getFormaId(forma_I), TIPO_TEXTO, asterisco);
+                    enfileira(anotacoes_svg, forma_asterisco);
+                    
+                    printf("✓ Asterisco vermelho criado em (%.2f, %.2f)\n", x_esmagada, y_esmagada);
+                }
+
                 area_esmagada_round += area_I;
                 if (formas_esmagadas != NULL) {
                     (*formas_esmagadas)++;
                 }
 
-                // I é destruído, J volta ao chão
                 destroiForma(forma_I);
                 adicionaFormaChao(chao, forma_J);
             }
-         
-// ========== REGRA 2: área(I) >= área(J) ==========
-else {
-    printf(">>> REGRA 2: I >= J <<<\n");
-    printf("Forma ID=%d (área=%.2f) modifica ID=%d (área=%.2f)\n",
-           getFormaId(forma_I), area_I, getFormaId(forma_J), area_J);
+            
+            //========== REGRA 2: área(I) >= área(J) ==========
+            else {
+                printf(">>> REGRA 2: I >= J <<<\n");
+                printf("Forma ID=%d (área=%.2f) modifica ID=%d (área=%.2f)\n",
+                       getFormaId(forma_I), area_I, getFormaId(forma_J), area_J);
 
-    if (arquivo_txt) {
-        fprintf(arquivo_txt, "<<<-- I >= J -->>> Forma %d (área %.2f) modifica forma %d (área %.2f).\n",
-                getFormaId(forma_I), area_I, getFormaId(forma_J), area_J);
-    }
+                if (arquivo_txt) {
+                    fprintf(arquivo_txt, "<<<-- I >= J -->>> Forma %d (área %.2f) modifica forma %d (área %.2f).\n",
+                            getFormaId(forma_I), area_I, getFormaId(forma_J), area_J);
+                }
 
-    // APENAS MUDA A COR DE BORDA DE J
-    char corPreenchI[64];
-    strncpy(corPreenchI, getFormaCorPreenchimento(forma_I), 63);
-    corPreenchI[63] = '\0';
-    
-    printf("DEBUG - Mudando borda de J para: '%s'\n", corPreenchI);
-    printf("DEBUG - J ANTES: borda='%s', preench='%s'\n",
-           getFormaCorBorda(forma_J), getFormaCorPreenchimento(forma_J));
-    
-    // SÓ muda a borda de J 
-    setFormaCorBorda(forma_J, corPreenchI);
-    
-    printf("DEBUG - J DEPOIS: borda='%s', preench='%s'\n",
-           getFormaCorBorda(forma_J), getFormaCorPreenchimento(forma_J));
+                //muda a cor de borda de J
+                char corPreenchI[64];
+                strncpy(corPreenchI, getFormaCorPreenchimento(forma_I), 63);
+                corPreenchI[63] = '\0';
+                
+                setFormaCorBorda(forma_J, corPreenchI);
 
-    // Clona I com cores invertidas
-    Forma clone_I = clonarFormaInvertida(forma_I);
-    
-    if (clone_I != NULL && formas_clonadas != NULL) {
-        (*formas_clonadas)++;
-        printf("✓ Clone criado: ID=%d, borda='%s', preench='%s'\n", 
-               getFormaId(clone_I),
-               getFormaCorBorda(clone_I),
-               getFormaCorPreenchimento(clone_I));
-    }
+                //clona I com cores invertidas
+                Forma clone_I = clonarFormaInvertida(forma_I);
+                
+                if (clone_I != NULL && formas_clonadas != NULL) {
+                    (*formas_clonadas)++;
+                    printf("✓ Clone criado: ID=%d\n", getFormaId(clone_I));
+                }
 
-    // ========== ORDEM CRÍTICA: J → I → Clone_I ==========
-    adicionaFormaChao(chao, forma_J);   // 1º: J (com borda modificada, preench original)
-    adicionaFormaChao(chao, forma_I);   // 2º: I (cores originais)
-    if (clone_I != NULL) {
-        adicionaFormaChao(chao, clone_I); // 3º: Clone (cores invertidas)
-    }
-}
+                //ordem crítica: J → I → Clone_I
+                adicionaFormaChao(chao, forma_J);
+                adicionaFormaChao(chao, forma_I);
+                if (clone_I != NULL) {
+                    adicionaFormaChao(chao, clone_I);
+                }
+            }
         }
         else {
-            // ========== SEM SOBREPOSIÇÃO ==========
+            //========== SEM SOBREPOSIÇÃO ==========
             printf("✗ Não há sobreposição\n");
             if (arquivo_txt) {
                 fprintf(arquivo_txt, "Forma %d (I) vs Forma %d (J). NÃO HOUVE SOBREPOSIÇÃO.\n",
                         getFormaId(forma_I), getFormaId(forma_J));
             }
 
-            // Mantém ordem relativa: I → J
             adicionaFormaChao(chao, forma_I);
             adicionaFormaChao(chao, forma_J);
         }
     }
 
-    // ========== Processa forma ímpar (se houver) ==========
+    //processa forma ímpar (se houver)
     if (!estaVaziaFila(arena->filaDeFormas)) {
         Forma ultima = desenfileira(arena->filaDeFormas);
         printf("\n>>> Forma ímpar (ID=%d) devolvida ao chão sem processamento\n", 
@@ -429,12 +410,10 @@ else {
         adicionaFormaChao(chao, ultima);
     }
 
-    // ========== Atualiza pontuação total ==========
     if (pontuacao_total != NULL) {
         *pontuacao_total += area_esmagada_round;
     }
 
-    // ========== Relatório final ==========
     printf("\n=== PROCESSAMENTO CONCLUÍDO ===\n");
     printf("Formas esmagadas: %d\n", formas_esmagadas ? *formas_esmagadas : 0);
     printf("Formas clonadas: %d\n", formas_clonadas ? *formas_clonadas : 0);
