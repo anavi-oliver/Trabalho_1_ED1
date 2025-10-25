@@ -184,7 +184,7 @@ void imprimeLinhaSVG(Linha l, FILE *arquivo) {
     
     //adiciona pontilhado se precisar
     if (linha->pontilhada) {
-        fprintf(arquivo, " stroke-dasharray=\"5,5\"");
+        fprintf(arquivo, " stroke-dasharray=\"1,1\"");
     }
     
     fprintf(arquivo, " />\n");
