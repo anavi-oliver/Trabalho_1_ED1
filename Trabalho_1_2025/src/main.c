@@ -20,7 +20,7 @@
 //makefile com padrão C99.
 #define PATH_LEN 512
 #define FILE_NAME_LEN 256
-#define MAX_FULL_PATH 1024  // Tamanho fixo 
+#define MAX_FULL_PATH 2048  // Tamanho fixo 
 
 // ======================= FUNÇÕES AUXILIARES DE CAMINHO =======================
 static void trataPath(char *path, int tamMax, char* arg) {
@@ -247,7 +247,7 @@ if (arqQry[0] != '\0') {
     sprintf(nomeSaidaBaseQry, "%s-%s", nomeBaseGeo, nomeBaseQry);
     
     char nomeTxtQry[MAX_FULL_PATH];
-    sprintf(nomeTxtQry, "%s.txt", nomeSaidaBaseQry);
+    snprintf(nomeTxtQry, sizeof(nomeTxtQry), "%s.txt", nomeSaidaBaseQry);
     
     char *caminhoTxtQry = montaCaminhoCompleto(dirSaida, nomeTxtQry);
     
@@ -263,7 +263,7 @@ printf("Formas esmagadas: %d\n", formas_esmagadas);
 
 // --- Geração do SVG Final (após o QRY) ---
     char nomeSvgFinal[MAX_FULL_PATH];
-    sprintf(nomeSvgFinal, "%s.svg", nomeSaidaBaseQry);
+    snprintf(nomeSvgFinal, sizeof(nomeSvgFinal), "%s.svg", nomeSaidaBaseQry);
     char *caminhoSvgFinal = montaCaminhoCompleto(dirSaida, nomeSvgFinal);
 
 printf("Gerando SVG final: %s\n", caminhoSvgFinal);

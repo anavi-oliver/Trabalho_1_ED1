@@ -12,14 +12,10 @@ FILE* inicializaSvg(char *caminho, double largura, double altura) {
     }
 
     // SVG com viewBox
-double margem = 50.0;
     fprintf(svg, "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 %.0f %.0f\">\n", largura, altura);
     
     //fundo cinza claro, tirei pra ver com o gabarito
     //fprintf(svg, "\t<rect width=\"100%%\" height=\"100%%\" fill=\"#f0f0f0\" />\n");
-
-    //fundo branco
-    //fprintf(svg, "\t<rect width=\"100%%\" height=\"100%%\" fill=\"white\" />\n");
 
     return svg;
 }
