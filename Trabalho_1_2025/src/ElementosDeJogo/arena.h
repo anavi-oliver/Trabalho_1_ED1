@@ -115,7 +115,7 @@ void iteraFormasArena(const Arena a, void (*executa)(Forma f, void *auxData), vo
  *    - Adiciona área de I à pontuação total
  * 
  * 4. Se HÁ sobreposição e área(I) >= área(J):
- *    - Forma I modifica as cores de J:
+ *    - Forma I modifica as cores de j:
  *      * Cor de borda de J = cor de preenchimento de I
  *      * Cor de preenchimento de J = cor de borda de I
  *    - Ordem de retorno ao chão: J, depois I, depois clone de I

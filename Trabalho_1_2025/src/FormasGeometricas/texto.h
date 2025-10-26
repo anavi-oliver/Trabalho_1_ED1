@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+//ponteiro generico para o texto e estilo do texto, ambos serão explicados abaixo
 typedef void * Texto;
 typedef void * Estilo;
 
