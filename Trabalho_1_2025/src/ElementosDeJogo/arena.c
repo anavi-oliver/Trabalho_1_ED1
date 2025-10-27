@@ -7,6 +7,7 @@
 #include "chao.h"
 #include "fila.h"
 #include "formas.h"
+#include "sobreposicao.h"
 
 #define PI 3.14159265358979323846
 
@@ -172,100 +173,7 @@ static Forma clonarFormaInvertida(Forma f1) {
     return NULL;
 }
 
-/*________________________________ VERIFICAÇÃO DE SOBREPOSIÇÃO ________________________________*/
 
-static bool formasSobrepoem(Forma f1, Forma f2) {
-    if (f1 == NULL || f2 == NULL) {
-        return false;
-    }
-
-    TipoForma tipo1 = getFormaTipo(f1);
-    TipoForma tipo2 = getFormaTipo(f2);
-
-    //CASO 1: Círculo vs Círculo
-    if (tipo1 == TIPO_CIRCULO && tipo2 == TIPO_CIRCULO) {
-        Circulo c1 = getFormaAssoc(f1);
-        Circulo c2 = getFormaAssoc(f2);
-        
-        double x1 = getXCirculo(c1);
-        double y1 = getYCirculo(c1);
-        double r1 = getRCirculo(c1);
-        
-        double x2 = getXCirculo(c2);
-        double y2 = getYCirculo(c2);
-        double r2 = getRCirculo(c2);
-        
-        double dx = x1 - x2;
-        double dy = y1 - y2;
-        double distQuadrada = dx * dx + dy * dy;
-        double somaRaios = r1 + r2;
-        
-        return distQuadrada <= (somaRaios * somaRaios);
-    }
-
-    //CASO 2: Retângulo vs Retângulo
-    if (tipo1 == TIPO_RETANGULO && tipo2 == TIPO_RETANGULO) {
-        Retangulo r1 = getFormaAssoc(f1);
-        Retangulo r2 = getFormaAssoc(f2);
-        
-        double x1 = getXRetangulo(r1);
-        double y1 = getYRetangulo(r1);
-        double w1 = getLarguraRetangulo(r1);
-        double h1 = getAlturaRetangulo(r1);
-        
-        double x2 = getXRetangulo(r2);
-        double y2 = getYRetangulo(r2);
-        double w2 = getLarguraRetangulo(r2);
-        double h2 = getAlturaRetangulo(r2);
-        
-        bool overlapX = (x1 < x2 + w2) && (x1 + w1 > x2);
-        bool overlapY = (y1 < y2 + h2) && (y1 + h1 > y2);
-        
-        return overlapX && overlapY;
-    }
-
-    //CASO 3: Círculo vs Retângulo
-    if ((tipo1 == TIPO_CIRCULO && tipo2 == TIPO_RETANGULO) ||
-        (tipo1 == TIPO_RETANGULO && tipo2 == TIPO_CIRCULO)) {
-        
-        Circulo c;
-        Retangulo r;
-        
-        if (tipo1 == TIPO_CIRCULO) {
-            c = getFormaAssoc(f1);
-            r = getFormaAssoc(f2);
-        } else {
-            c = getFormaAssoc(f2);
-            r = getFormaAssoc(f1);
-        }
-        
-        double cx = getXCirculo(c);
-        double cy = getYCirculo(c);
-        double raio = getRCirculo(c);
-        
-        double rx = getXRetangulo(r);
-        double ry = getYRetangulo(r);
-        double w = getLarguraRetangulo(r);
-        double h = getAlturaRetangulo(r);
-        
-        double closestX = cx;
-        double closestY = cy;
-        
-        if (cx < rx) closestX = rx;
-        else if (cx > rx + w) closestX = rx + w;
-        
-        if (cy < ry) closestY = ry;
-        else if (cy > ry + h) closestY = ry + h;
-        
-        double dx = cx - closestX;
-        double dy = cy - closestY;
-        double distQuadrada = dx * dx + dy * dy;
-        
-        return distQuadrada <= (raio * raio);
-    }
-
-    return false;
-}
 
 /*________________________________ PROCESSAMENTO DE INTERAÇÕES ________________________________*/
 
@@ -282,9 +190,6 @@ void processaInteracoesArena(Arena a, Chao chao, double *pontuacao_total, Queue 
     double area_esmagada_round = 0.0;
     int total_formas_inicial = getTamanhoFila(arena->filaDeFormas);
 
-    printf("\n=== INICIANDO PROCESSAMENTO DA ARENA ===\n");
-    printf("Total de formas na arena: %d\n", total_formas_inicial);
-
     if (arquivo_txt) {
         fprintf(arquivo_txt, "\n=== PROCESSAMENTO DA ARENA ===\n");
         fprintf(arquivo_txt, "Total de formas: %d\n\n", total_formas_inicial);
@@ -299,16 +204,62 @@ void processaInteracoesArena(Arena a, Chao chao, double *pontuacao_total, Queue 
             break;
         }
 
-        printf("\n--- Comparando formas ---\n");
-        printf("Forma I: ID=%d, Pos=(%.2f, %.2f), Área=%.2f\n", 
-               getFormaId(forma_I), getFormaX(forma_I), getFormaY(forma_I), getFormaArea(forma_I));
-        printf("Forma J: ID=%d, Pos=(%.2f, %.2f), Área=%.2f\n", 
-               getFormaId(forma_J), getFormaX(forma_J), getFormaY(forma_J), getFormaArea(forma_J));
+//verificacao de sobreposicao
+        bool sobrepoe = false;
+        TipoForma tipo_I = getFormaTipo(forma_I);
+        TipoForma tipo_J = getFormaTipo(forma_J);
 
-        bool sobrepoe = formasSobrepoem(forma_I, forma_J);
+        // Usar as funções do módulo sobreposicao.h
+        if (tipo_I == TIPO_CIRCULO && tipo_J == TIPO_CIRCULO) {
+            sobrepoe = sobreposicaoCirculoCirculo(getFormaAssoc(forma_I), getFormaAssoc(forma_J));
+
+        } else if (tipo_I == TIPO_CIRCULO && tipo_J == TIPO_RETANGULO) {
+            sobrepoe = sobreposicaoCirculoRetangulo(getFormaAssoc(forma_I), getFormaAssoc(forma_J));
+
+        } else if (tipo_I == TIPO_RETANGULO && tipo_J == TIPO_CIRCULO) {
+            sobrepoe = sobreposicaoCirculoRetangulo(getFormaAssoc(forma_J), getFormaAssoc(forma_I));
+
+        } else if (tipo_I == TIPO_RETANGULO && tipo_J == TIPO_RETANGULO) {
+            sobrepoe = sobreposicaoRetanguloRetangulo(getFormaAssoc(forma_I), getFormaAssoc(forma_J));
+
+        } else if (tipo_I == TIPO_CIRCULO && tipo_J == TIPO_LINHA) {
+            sobrepoe = sobreposicaoCirculoLinha(getFormaAssoc(forma_I), getFormaAssoc(forma_J));
+
+        } else if (tipo_I == TIPO_LINHA && tipo_J == TIPO_CIRCULO) {
+            sobrepoe = sobreposicaoCirculoLinha(getFormaAssoc(forma_J), getFormaAssoc(forma_I));
+
+        } else if (tipo_I == TIPO_CIRCULO && tipo_J == TIPO_TEXTO) {
+            sobrepoe = sobreposicaoCirculoTexto(getFormaAssoc(forma_I), getFormaAssoc(forma_J));
+
+        } else if (tipo_I == TIPO_TEXTO && tipo_J == TIPO_CIRCULO) {
+            sobrepoe = sobreposicaoCirculoTexto(getFormaAssoc(forma_J), getFormaAssoc(forma_I));
+
+        } else if (tipo_I == TIPO_RETANGULO && tipo_J == TIPO_LINHA) {
+            sobrepoe = sobreposicaoRetanguloLinha(getFormaAssoc(forma_I), getFormaAssoc(forma_J));
+
+        } else if (tipo_I == TIPO_LINHA && tipo_J == TIPO_RETANGULO) {
+            sobrepoe = sobreposicaoRetanguloLinha(getFormaAssoc(forma_J), getFormaAssoc(forma_I));
+
+        } else if (tipo_I == TIPO_RETANGULO && tipo_J == TIPO_TEXTO) {
+            sobrepoe = sobreposicaoRetanguloTexto(getFormaAssoc(forma_I), getFormaAssoc(forma_J));
+
+        } else if (tipo_I == TIPO_TEXTO && tipo_J == TIPO_RETANGULO) {
+            sobrepoe = sobreposicaoRetanguloTexto(getFormaAssoc(forma_J), getFormaAssoc(forma_I));
+
+        } else if (tipo_I == TIPO_LINHA && tipo_J == TIPO_LINHA) {
+            sobrepoe = sobreposicaoLinhaLinha(getFormaAssoc(forma_I), getFormaAssoc(forma_J));
+
+        } else if (tipo_I == TIPO_LINHA && tipo_J == TIPO_TEXTO) {
+            sobrepoe = sobreposicaoLinhaTexto(getFormaAssoc(forma_I), getFormaAssoc(forma_J));
+
+        } else if (tipo_I == TIPO_TEXTO && tipo_J == TIPO_LINHA) {
+            sobrepoe = sobreposicaoLinhaTexto(getFormaAssoc(forma_J), getFormaAssoc(forma_I));
+
+        } else if (tipo_I == TIPO_TEXTO && tipo_J == TIPO_TEXTO) {
+            sobrepoe = sobreposicaoTextoTexto(getFormaAssoc(forma_I), getFormaAssoc(forma_J));
+        }
 
         if (sobrepoe) {
-            printf("✓ Sobreposição detectada!\n");
 
             double area_I = getFormaArea(forma_I);
             double area_J = getFormaArea(forma_J);
@@ -320,10 +271,6 @@ void processaInteracoesArena(Arena a, Chao chao, double *pontuacao_total, Queue 
 
             //========== REGRA 1: área(I) < área(J) ==========
             if (area_I < area_J) {
-                printf(">>> REGRA 1: I < J <<<\n");
-                printf("* Forma ID=%d (área=%.2f) ESMAGADA por ID=%d (área=%.2f)\n",
-                       getFormaId(forma_I), area_I, getFormaId(forma_J), area_J);
-
                 if (arquivo_txt) {
                     fprintf(arquivo_txt, "<<<-- I < J -->>> *Forma %d (área %.2f) ESMAGADA por forma %d (área %.2f).\n",
                             getFormaId(forma_I), area_I, getFormaId(forma_J), area_J);
@@ -343,7 +290,6 @@ void processaInteracoesArena(Arena a, Chao chao, double *pontuacao_total, Queue 
                     Forma forma_asterisco = criaForma(-5000 - getFormaId(forma_I), TIPO_TEXTO, asterisco);
                     enfileira(anotacoes_svg, forma_asterisco);
                     
-                    printf("✓ Asterisco vermelho criado em (%.2f, %.2f)\n", x_esmagada, y_esmagada);
                 }
 
                 area_esmagada_round += area_I;
@@ -357,10 +303,6 @@ void processaInteracoesArena(Arena a, Chao chao, double *pontuacao_total, Queue 
             
             //========== REGRA 2: área(I) >= área(J) ==========
             else {
-                printf(">>> REGRA 2: I >= J <<<\n");
-                printf("Forma ID=%d (área=%.2f) modifica ID=%d (área=%.2f)\n",
-                       getFormaId(forma_I), area_I, getFormaId(forma_J), area_J);
-
                 if (arquivo_txt) {
                     fprintf(arquivo_txt, "<<<-- I >= J -->>> Forma %d (área %.2f) modifica forma %d (área %.2f).\n",
                             getFormaId(forma_I), area_I, getFormaId(forma_J), area_J);
@@ -378,7 +320,6 @@ void processaInteracoesArena(Arena a, Chao chao, double *pontuacao_total, Queue 
                 
                 if (clone_I != NULL && formas_clonadas != NULL) {
                     (*formas_clonadas)++;
-                    printf("✓ Clone criado: ID=%d\n", getFormaId(clone_I));
                 }
 
                 //ordem crítica: J → I → Clone_I
@@ -391,7 +332,6 @@ void processaInteracoesArena(Arena a, Chao chao, double *pontuacao_total, Queue 
         }
         else {
             //========== SEM SOBREPOSIÇÃO ==========
-            printf("✗ Não há sobreposição\n");
             if (arquivo_txt) {
                 fprintf(arquivo_txt, "Forma %d (I) vs Forma %d (J). NÃO HOUVE SOBREPOSIÇÃO.\n",
                         getFormaId(forma_I), getFormaId(forma_J));
@@ -405,19 +345,12 @@ void processaInteracoesArena(Arena a, Chao chao, double *pontuacao_total, Queue 
     //processa forma ímpar (se houver)
     if (!estaVaziaFila(arena->filaDeFormas)) {
         Forma ultima = desenfileira(arena->filaDeFormas);
-        printf("\n>>> Forma ímpar (ID=%d) devolvida ao chão sem processamento\n", 
-               getFormaId(ultima));
         adicionaFormaChao(chao, ultima);
     }
 
     if (pontuacao_total != NULL) {
         *pontuacao_total += area_esmagada_round;
     }
-
-    printf("\n=== PROCESSAMENTO CONCLUÍDO ===\n");
-    printf("Formas esmagadas: %d\n", formas_esmagadas ? *formas_esmagadas : 0);
-    printf("Formas clonadas: %d\n", formas_clonadas ? *formas_clonadas : 0);
-    printf("Área total esmagada: %.2f\n\n", area_esmagada_round);
 
     if (arquivo_txt) {
         fprintf(arquivo_txt, "\nÁrea total esmagada: %.2f\n", area_esmagada_round);

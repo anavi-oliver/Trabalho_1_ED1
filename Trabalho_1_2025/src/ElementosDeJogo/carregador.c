@@ -25,9 +25,7 @@ Carregador criaCarregador(int id) {
     }
 
     c->id = id;
-    
-    printf("Carregador %d criado com sucesso!\n", id);
-    
+        
     return (Carregador)c;
 }
 

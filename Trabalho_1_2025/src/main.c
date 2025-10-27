@@ -197,7 +197,6 @@ int main(int argc, char *argv[]) {
 
     // ======================= 4. PROCESSAMENTO DO ARQUIVO .GEO =======================
 
-    printf("Iniciando processamento do arquivo GEO: %s\n", caminhoCompletoGeo);
     // processaGeo retorna o Chao, que é o repositório inicial
     meuChao = processaGeo(caminhoCompletoGeo);
     
@@ -210,16 +209,13 @@ int main(int argc, char *argv[]) {
 
     // ======================= 5. GERAÇÃO DO SVG INICIAL (ESTADO DO CHÃO) =======================
 
-    // Nome do arquivo SVG inicial: arq.svg
     char nomeSvgInicial[MAX_FULL_PATH];
     sprintf(nomeSvgInicial, "%s.svg", nomeBaseGeo);
     char *caminhoSvgInicial = montaCaminhoCompleto(dirSaida, nomeSvgInicial);
     
-    printf("Gerando SVG inicial: %s\n", caminhoSvgInicial);
     FILE *svgInicial = inicializaSvg(caminhoSvgInicial, LARGURA_ARENA, ALTURA_ARENA);
     
     if (svgInicial != NULL) {
-        // Desenha todas as formas que estão no Chao
         desenhaContainerFormas(meuChao, svgInicial);
         fechaSvg(svgInicial);
     } else {
@@ -233,7 +229,6 @@ int main(int argc, char *argv[]) {
     int formas_esmagadas = 0;
 
 if (arqQry[0] != '\0') {
-    // Extrair apenas o nome do arquivo .qry (sem subdiretórios)
     char *ultimaBarra = strrchr(arqQry, '/');
     char *nomeArquivoQry = (ultimaBarra != NULL) ? ultimaBarra + 1 : arqQry;
     
@@ -242,7 +237,6 @@ if (arqQry[0] != '\0') {
 
     char *caminhoCompletoQry = montaCaminhoCompleto(dirEntrada, arqQry);
     
-    // Nomes de saída do QRY: arq-arqcons.svg e arq-arqcons.txt
     char nomeSaidaBaseQry[MAX_FULL_PATH];
     sprintf(nomeSaidaBaseQry, "%s-%s", nomeBaseGeo, nomeBaseQry);
     
@@ -254,19 +248,14 @@ if (arqQry[0] != '\0') {
     // Chamada principal para processar o QRY
 processaQry(caminhoCompletoQry, caminhoTxtQry, minhaArena, meuChao, 
             &pontuacaoTotal, &formas_clonadas, &formas_esmagadas);
-    
-printf("Processamento QRY concluido.\n");
-printf("Pontuacao final: %.2f\n", pontuacaoTotal);
-printf("Formas clonadas: %d\n", formas_clonadas);
-printf("Formas esmagadas: %d\n", formas_esmagadas);
 
 
-// --- Geração do SVG Final (após o QRY) ---
+
+//Geração do SVG Final
     char nomeSvgFinal[MAX_FULL_PATH];
     snprintf(nomeSvgFinal, sizeof(nomeSvgFinal), "%s.svg", nomeSaidaBaseQry);
     char *caminhoSvgFinal = montaCaminhoCompleto(dirSaida, nomeSvgFinal);
 
-printf("Gerando SVG final: %s\n", caminhoSvgFinal);
     FILE *svgFinal = inicializaSvg(caminhoSvgFinal, LARGURA_ARENA, ALTURA_ARENA);
 
 if (svgFinal != NULL) {
@@ -283,15 +272,10 @@ if (svgFinal != NULL) {
 }
 
 
-    // ======================= 7. LIBERAÇÃO DE MEMÓRIA =======================
-
-    printf("\nIniciando liberacao de memoria...\n");
-    
+    // ======================= 7. LIBERAÇÃO DE MEMÓRIA =======================    
     destroiArena(minhaArena); 
     destroiChao(meuChao); 
     free(caminhoCompletoGeo);
-
-    printf("Programa ted encerrado com sucesso.\n");
     
     return EXIT_SUCCESS; 
 }

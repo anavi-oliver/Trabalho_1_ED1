@@ -195,13 +195,25 @@ double getFormaArea(const Forma f) {
     switch (forma->tipo) {
         case TIPO_CIRCULO:
             return calculaAreaCirculo(forma->dados_especificos);
+            
         case TIPO_RETANGULO:
             return calculaAreaRetangulo(forma->dados_especificos);
-        case TIPO_LINHA:
-            return calculaAreaLinha(forma->dados_especificos);
-        case TIPO_TEXTO:
-            //texto não tem área (pode depender da fonte, mas assumindo 0)
-            return 0.0;
+            
+        case TIPO_LINHA: {
+            Linha l = forma->dados_especificos;
+            double comprimento = calculaComprimentoLinha(l);
+            return 2.0 * comprimento;  //conforme o especificad
+        }
+            
+        case TIPO_TEXTO: {
+            Texto t = forma->dados_especificos;
+            char *str = getTexto(t);
+
+            if (str == NULL) return 0.0;
+            int numCaracteres = strlen(str);
+
+            return 20.0 * numCaracteres;  //conforme o especificado
+        }
     }
     return 0.0;  //caso padrão para tipos inválidos
 }
